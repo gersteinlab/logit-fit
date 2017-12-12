@@ -1309,6 +1309,9 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 		}
 	}
 	
+	// DEBUG
+	printf("Breakpoint 3a\n");
+	
 	// If X matrix was not full rank then columns were pivoted,
   // hence we need to re-label the names ...
   lm_pivot = lm.getPivot();
@@ -1318,6 +1321,9 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   	}
   }
   
+  // DEBUG
+	printf("Breakpoint 3b\n");
+  
   // update by accurate calculation, including 0-weight cases.
   vector<double> mu_eta_vec = mu_eta(eta);
   vector<double> residuals;
@@ -1326,6 +1332,9 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   	residuals.push_back(temp);
   }
   vector<vector<double> > lm_qr = lm.getQr();
+  
+  // DEBUG
+	printf("Breakpoint 3c\n");
   
   int sum_good = 0;
   for (unsigned int i = 0; i < good.size(); i++) {
