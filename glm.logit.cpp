@@ -1002,13 +1002,13 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	
 	// Initialize the eta's
 	vector<double> eta;
-	if (etastart.size() == 0) {
-		for (unsigned int i = 0; i < mu.size(); i++) {
-			eta.push_back(log(x_d_omx(mu[i])));
-		}
-	} else {
-		eta = etastart;
+// 	if (etastart.size() == 0) {
+	for (unsigned int i = 0; i < mu.size(); i++) {
+		eta.push_back(log(x_d_omx(mu[i])));
 	}
+// 	} else {
+// 		eta = etastart;
+// 	}
 	
 	for (unsigned int i = 0; i < eta.size(); i++) {
 		double tmp = (eta[i] < MTHRESH) ? DOUBLE_EPS : ((eta[i] > THRESH) ? INVEPS : exp(eta[i]));
@@ -1417,77 +1417,77 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 }
 
 /* The actual function. Can be called from main, or from other packages */
-fit glm_logit (vector<double> &y, vector<vector<double> > &x) {
-	// Assume link function is log
-	// Exclude model frame building since we will be conducting those operations manually
-	// negbin_family(y, x, mu, init_theta);
-	
-	// Control variables
-	double epsilon = 1e-8;
-	int maxit = 25;
-	
-	// Initial fit
-	vector<double> vec0;
-	
-	// DEBUG
-	// printf("Breakpoint Upsilon\n");
-	// exit(0);
-	
-	fit this_fit = glm_fit(y, x, init_theta, vec0);
-	
-	// DEBUG
-	// printf("Breakpoint Tau\n");
-	// exit(0);
-	
-	vector<double> mu = this_fit.getFittedValues();
-	pair <double,double> theta_ret = theta_ml(y, mu, (int)y.size(), 25);
-	double th = theta_ret.first;
-	double theta = th;
-	int n = (int)y.size();
-	
-	int iter = 0;
-	double d1 = sqrt(2 * max(1, this_fit.getDFResidual()));
-	double del = 1.0;
-	double d2 = 1.0;
-	// g refers to the link function
-	double Lm = loglik(n, th, mu, y);
-	double Lm0 = Lm + 2 * d1;
-	fit cur_fit;
-	
-	// DEBUG
-	// printf("Breakpoint Alpha\n");
-	// exit(0);
-	
-	while ((iter < maxit) && (abs(Lm0 - Lm)/d1 + abs(del)/d2) > epsilon) {
-		vector<double> eta;
-		for (unsigned int i = 0; i < mu.size(); i++) {
-			eta.push_back(linkfun(mu[i]));
-		}
-		cur_fit = glm_fit(y, x, theta, eta);
-		double t0 = th;
-		theta_ret = theta_ml(y, mu, (int)y.size(), 25);
-		th = theta_ret.first;
-		theta = th;
-		mu = this_fit.getFittedValues();
-		del = t0 - th;
-		Lm0 = Lm;
-		Lm = loglik(n, th, mu, y);
-		
-		iter++;
-	}
-	
-	// DEBUG
-	// printf("Breakpoint Beta\n");
-	
-	if (iter > maxit) {
-		printf("Warning: alternation limit reached\n");
-	}
-	cur_fit.setTheta(th);
-	cur_fit.setSETheta(theta_ret.second);
-	cur_fit.setTwoLogLik(2 * Lm);
-	cur_fit.setAIC((-1)*cur_fit.getTwoLogLik() + 2 * (double)cur_fit.getRank() + 2);
-	return cur_fit;
-}
+// fit glm_logit (vector<double> &y, vector<vector<double> > &x) {
+// 	// Assume link function is log
+// 	// Exclude model frame building since we will be conducting those operations manually
+// 	// negbin_family(y, x, mu, init_theta);
+// 	
+// 	// Control variables
+// 	double epsilon = 1e-8;
+// 	int maxit = 25;
+// 	
+// 	// Initial fit
+// 	vector<double> vec0;
+// 	
+// 	// DEBUG
+// 	// printf("Breakpoint Upsilon\n");
+// 	// exit(0);
+// 	
+// 	fit this_fit = glm_fit(y, x, init_theta, vec0);
+// 	
+// 	// DEBUG
+// 	// printf("Breakpoint Tau\n");
+// 	// exit(0);
+// 	
+// 	vector<double> mu = this_fit.getFittedValues();
+// 	pair <double,double> theta_ret = theta_ml(y, mu, (int)y.size(), 25);
+// 	double th = theta_ret.first;
+// 	double theta = th;
+// 	int n = (int)y.size();
+// 	
+// 	int iter = 0;
+// 	double d1 = sqrt(2 * max(1, this_fit.getDFResidual()));
+// 	double del = 1.0;
+// 	double d2 = 1.0;
+// 	// g refers to the link function
+// 	double Lm = loglik(n, th, mu, y);
+// 	double Lm0 = Lm + 2 * d1;
+// 	fit cur_fit;
+// 	
+// 	// DEBUG
+// 	// printf("Breakpoint Alpha\n");
+// 	// exit(0);
+// 	
+// 	while ((iter < maxit) && (abs(Lm0 - Lm)/d1 + abs(del)/d2) > epsilon) {
+// 		vector<double> eta;
+// 		for (unsigned int i = 0; i < mu.size(); i++) {
+// 			eta.push_back(linkfun(mu[i]));
+// 		}
+// 		cur_fit = glm_fit(y, x, theta, eta);
+// 		double t0 = th;
+// 		theta_ret = theta_ml(y, mu, (int)y.size(), 25);
+// 		th = theta_ret.first;
+// 		theta = th;
+// 		mu = this_fit.getFittedValues();
+// 		del = t0 - th;
+// 		Lm0 = Lm;
+// 		Lm = loglik(n, th, mu, y);
+// 		
+// 		iter++;
+// 	}
+// 	
+// 	// DEBUG
+// 	// printf("Breakpoint Beta\n");
+// 	
+// 	if (iter > maxit) {
+// 		printf("Warning: alternation limit reached\n");
+// 	}
+// 	cur_fit.setTheta(th);
+// 	cur_fit.setSETheta(theta_ret.second);
+// 	cur_fit.setTwoLogLik(2 * Lm);
+// 	cur_fit.setAIC((-1)*cur_fit.getTwoLogLik() + 2 * (double)cur_fit.getRank() + 2);
+// 	return cur_fit;
+// }
 
 /* Main function */
 int main (int argc, char* argv[]) {
