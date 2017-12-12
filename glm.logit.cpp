@@ -579,7 +579,7 @@ vector<double> dbinom (vector<double> x, vector<double> n, vector<double> p, boo
 	}
 	vector<double> q;
 	for (unsigned int i = 0; i < p.size(); i++) {
-		q[i] = 1 - p[i];
+		q.push_back(1 - p[i]);
 	}
 	
 	vector<double> result;
@@ -723,15 +723,15 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 	
 	// DEBUG
 	printf("Breakpoint Alpha\n");
-	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%d: %f\n", i, m_prod_y[i]);
-	}
-	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%d: %f\n", i, m[i]);
-	}
-	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%d: %f\n", i, mu[i]);
-	}
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		printf("%d: %f\n", i, m_prod_y[i]);
+// 	}
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		printf("%d: %f\n", i, m[i]);
+// 	}
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		printf("%d: %f\n", i, mu[i]);
+// 	}
 	
 	vector<double> db = dbinom(m_prod_y, m, mu, true);
 	
