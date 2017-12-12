@@ -662,7 +662,7 @@ vector<double> logit_dev_residuals (vector<double> &y, vector<double> &mu) {
 	// int i;
 	unsigned int n = y.size();
 	unsigned int lmu = mu.size();
-	int nprot = 1;
+	// int nprot = 1;
 	
 	for (unsigned int i = 0; i < n; i++) {
 		result.push_back(y[i]);
@@ -673,7 +673,7 @@ vector<double> logit_dev_residuals (vector<double> &y, vector<double> &mu) {
 		exit(1);
 	}
 	
-	for (int i = 0; i < n; i++) {
+	for (int i = 0; i < (int)n; i++) {
 		result[i] = 2 * (y_log_y(y[i], mu[i]) + y_log_y(1 - y[i], 1 - mu[i]));
 	}
 	return result;
@@ -698,16 +698,16 @@ double logit_aic (vector<double> &y, vector<double> &n, vector<double> &mu, vect
 		}
 	}
 	
-	double sum_m = 0;
-	double sum = 0;
-	for (unsigned int i = 0; i < n.size(); i++) {
-		sum_m += m[i];
-	}
-	if (sum_m > 0) {
-		for (unsigned int i = 0; i < n.size(); i++) {
-			sum += wt[i]/m[i];
-		}
-	}
+// 	double sum_m = 0;
+// 	double sum = 0;
+// 	for (unsigned int i = 0; i < n.size(); i++) {
+// 		sum_m += m[i];
+// 	}
+// 	if (sum_m > 0) {
+// 		for (unsigned int i = 0; i < n.size(); i++) {
+// 			sum += 1/m[i];
+// 		}
+// 	}
 	
 	vector<double> m_prod_y;
 	vector<double> m_rounded;
@@ -720,7 +720,15 @@ double logit_aic (vector<double> &y, vector<double> &n, vector<double> &mu, vect
 		m_rounded.push_back(round(m[i]));
 	}
 	
-	return -2*sum*dbinom(m_prod_y, m_rounded, mu, true);
+	vector<double> db = dbinom(m_prod_y, m_rounded, mu, true);
+	double sum = 0;
+	for (unsigned int i = 0; i < n.size(); i++) {
+		if (m[i] > 0) {
+			sum += 1/m[i]*db[i];
+		}
+	}
+	
+	return -2*sum;
 }
 
 // [ret] dqrdc2(vector<vector<double> > x, int n, int n, int p, double tol, int *k,
@@ -1080,7 +1088,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x, double init_theta,
 				z.push_back(this_val);
 			}
 		}
-		vector<double> w;
+		// vector<double> w;
 		for (unsigned int j = 0; j < y.size(); j++) {
 			if (good[j] == true) {
 				double this_val = sqrt(pow(mu_eta_val[j],2.0))/varmu[j];
