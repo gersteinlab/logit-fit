@@ -974,6 +974,10 @@ pair <double,double> theta_ml (vector<double> &y, vector<double> &mu, double n, 
  * for the logistic regression fit
  */
 fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
+
+	// DEBUG
+	printf("Breakpoint 1\n");
+
 	// Control variables
 	double epsilon = 1e-8;
 	int maxit = 25;
@@ -1040,6 +1044,9 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	// DEBUG
 	// printf("Breakpoint Upsilon\n");
 	// exit(0);
+	
+	// DEBUG
+	printf("Breakpoint 2\n");
 	
 	// The iteratively reweighting L.S. iteration
 	int iter = 0;
@@ -1283,6 +1290,9 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	
 	// DEBUG
 	// printf("Breakpoint Tau\n");
+	
+	// DEBUG
+	printf("Breakpoint 3\n");
 	
 	if (!conv) {
 		fprintf(stderr, "Warning: fitting algorithm did not converge\n");
@@ -1631,7 +1641,7 @@ int main (int argc, char* argv[]) {
 	x_tr.clear();
 	
 	// DEBUG
-	// printf("Breakpoint Gamma\n");
+	printf("Breakpoint Gamma\n");
 	// exit(0);
 	
 	// Do the actual glm_logit fitting
