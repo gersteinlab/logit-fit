@@ -1381,6 +1381,10 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 			Rmat.push_back(temp);
 		}
 	}
+	
+	// DEBUG
+	printf("Breakpoint 3d\n");
+	
   vector<double> wt;
   for (unsigned int i = 0; i < y.size(); i++) {
   	if (good[i]) {
@@ -1396,11 +1400,17 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   }
   wtdmu = wtdmu/(double)nobs;
   
+  // DEBUG
+	printf("Breakpoint 3e\n");
+  
   // Produce a vector version of wtdmu
   vector<double> wtdmu_vec;
   for (unsigned int i = 0; i < y.size(); i++) {
   	wtdmu_vec.push_back(wtdmu);
   }
+  
+  // DEBUG
+	printf("Breakpoint 3f\n");
   
   vector<double> nulldev_vec = logit_dev_residuals(y, wtdmu_vec);
   double nulldev = 0.0;
@@ -1413,6 +1423,9 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   int nulldf = n_ok - 1;
   int rank = lm.getRank();
   int resdf = n_ok - rank;
+  
+  // DEBUG
+	printf("Breakpoint 3g\n");
   
   // calculate AIC
   double aic_model = logit_aic(y, n, mu) + 2*rank;
