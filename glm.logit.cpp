@@ -628,6 +628,7 @@ vector<double> dbinom (vector<double> x, vector<double> n, vector<double> p, boo
 
 		result.push_back(R_D_exp((lc - 0.5*lf), log_p));
 	}
+	return result;
 }
 
 /* Logistic binomial helper functions */
@@ -680,7 +681,7 @@ vector<double> logit_dev_residuals (vector<double> &y, vector<double> &mu) {
 }
 
 // Calculate the AIC
-double logit_aic (vector<double> &y, vector<double> &n, vector<double> &mu, vector<double> &dev) {
+double logit_aic (vector<double> &y, vector<double> &n, vector<double> &mu) {
 	vector<double> m;
 	bool is_n = false;
 	for (unsigned int i = 0; i < n.size(); i++) {
@@ -983,6 +984,9 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x, double init_theta,
 	int nobs = (int)y.size();
 	int nvars = (int)x.size();
 	
+	vector<int> lm_pivot;
+	vector<bool> good;
+	
 	// Eta always valid
 	
 	// Initialize the mu's
@@ -1064,7 +1068,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x, double init_theta,
 		}
 		
 		// Save the good ones (i.e. the ones where mu_eta_val is nonzero)
-		vector<bool> good;
+		good.clear();
 		unsigned int num_false = 0;
 		for (unsigned int i = 0; i < mu_eta_val.size(); i++) {
 			if (mu_eta_val[i] != 0) {
@@ -1143,7 +1147,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x, double init_theta,
 		}
 		
 		// calculate updated values of eta and mu with the new coef
-		vector<int> lm_pivot = lm.getPivot();
+		lm_pivot = lm.getPivot();
 		vector<double> start; // (nvars,0.0);
 		for (int j = 0; j < nvars; j++) {
 			// This code not necessary: if (lm_pivot[j]) {
@@ -1291,13 +1295,14 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x, double init_theta,
 	double eps = 10*epsilon;
 	for (unsigned int i = 0; i < mu.size(); i++) {
 		if ((mu[i] > 1-eps) || (mu[i] < eps)) {
-			printf(stderr, "Warning: Fitted probabilities numerically 0 or 1 occurred\n");
+			fprintf(stderr, "Warning: Fitted probabilities numerically 0 or 1 occurred\n");
 			break;
 		}
 	}
 	
 	// If X matrix was not full rank then columns were pivoted,
   // hence we need to re-label the names ...
+  lm_pivot = lm.getPivot();
   if (lm.getRank() < nvars) {
   	for (unsigned int i = lm.getRank(); i < (unsigned int)nvars; i++) {
   		coef[lm_pivot[i]-1] = 0;
@@ -1324,7 +1329,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x, double init_theta,
   if (nr < nvars) {
   	for (unsigned int i = 0; i < (unsigned int)nvars; i++) {
   		vector<double> temp;
-  		if (i < nr) {
+  		if (i < (unsigned int)nr) {
   			for (unsigned int j = 0; j < (unsigned int)nvars; j++) {
   				if (i > j) {
 						temp.push_back(0.0);
@@ -1392,7 +1397,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x, double init_theta,
   int resdf = n_ok - rank;
   
   // calculate AIC
-  double aic_model = logit_aic(y, n, mu, dev) + 2*rank;
+  double aic_model = logit_aic(y, n, mu) + 2*rank;
   
   vector<double> effects = lm.getEffects();
   
