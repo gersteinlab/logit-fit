@@ -1504,20 +1504,20 @@ int main (int argc, char* argv[]) {
  	string x_file;
  	
  	// The initial theta to use in fitting
- 	double init_theta;
+ 	// double init_theta;
  	
  	// DEBUG
  	// printf("Breakpoint Pre-Sigma\n");
  	
  	// Argument checking
- 	if (argc != 4) {
- 		printf("Incorrect number of arguments: found %d but expected 3. Exiting.\n", argc-1);
- 		printf("Usage: glm.nb [response file] [predictor file] [initial theta]\n");
+ 	if (argc != 3) {
+ 		printf("Incorrect number of arguments: found %d but expected 2. Exiting.\n", argc-1);
+ 		printf("Usage: glm.logit [response file] [predictor file]\n");
  		return 1;
  	} else {
  		y_file = string(argv[1]);
  		x_file = string(argv[2]);
- 		init_theta = atof(argv[3]);
+ 		// init_theta = atof(argv[3]);
  	}
  	
  	// DEBUG
