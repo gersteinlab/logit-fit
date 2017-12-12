@@ -1430,15 +1430,15 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   // calculate AIC
   double aic_model = logit_aic(y, n, mu) + 2*rank;
   
+  // DEBUG
+	printf("Breakpoint 3h\n");
+  
   vector<double> effects = lm.getEffects();
   
   vector<double> weights;
   for (int i = 0; i < (int)y.size(); i++) {
   	weights.push_back(1.0);
   }
-  
-  // DEBUG
-	printf("Breakpoint 3h\n");
   
   vector<vector<double> > qr = lm.getQr();
 	vector<double> qraux = lm.getQraux();
