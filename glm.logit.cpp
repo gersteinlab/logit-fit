@@ -723,7 +723,7 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 	
 	vector<double> db = dbinom(m_prod_y, m_rounded, mu, true);
 	double sum = 0;
-	for (unsigned int i = 0; i < n.size(); i++) {
+	for (unsigned int i = 0; i < y.size(); i++) {
 		if (m[i] > 0) {
 			sum += 1/m[i]*db[i];
 		}
