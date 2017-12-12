@@ -973,8 +973,7 @@ pair <double,double> theta_ml (vector<double> &y, vector<double> &mu, double n, 
  * This is really a pared down glm_fit that only implements the portion needed
  * for the logistic regression fit
  */
-fit glm_fit (vector<double> &y, vector<vector<double> > &x, double init_theta, 
-						 vector<double> &etastart) {
+fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	// Control variables
 	double epsilon = 1e-8;
 	int maxit = 25;
@@ -1418,8 +1417,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x, double init_theta,
 }
 
 /* The actual function. Can be called from main, or from other packages */
-fit glm_nb (vector<double> &y, vector<vector<double> > &x, 
-											 double init_theta) {
+fit glm_logit (vector<double> &y, vector<vector<double> > &x) {
 	// Assume link function is log
 	// Exclude model frame building since we will be conducting those operations manually
 	// negbin_family(y, x, mu, init_theta);
@@ -1636,8 +1634,8 @@ int main (int argc, char* argv[]) {
 	// printf("Breakpoint Gamma\n");
 	// exit(0);
 	
-	// Do the actual glm_nb fitting
-	fit outfit = glm_nb(y, x, init_theta);
+	// Do the actual glm_logit fitting
+	fit outfit = glm_fit(y, x);
 	
 	// Output the values of "outfit"
 	vector<double> coefficients = outfit.getCoefficients();
