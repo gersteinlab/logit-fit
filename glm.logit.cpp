@@ -1083,7 +1083,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x, double init_theta,
 		
 		vector<double> z;
 		for (unsigned int j = 0; j < y.size(); j++) {
-			if (good[j] == true);
+			if (good[j] == true) {
 				double this_val = eta[j] + (y[j] - mu[j])/mu_eta_val[j];
 				z.push_back(this_val);
 			}
