@@ -681,23 +681,23 @@ vector<double> logit_dev_residuals (vector<double> &y, vector<double> &mu) {
 }
 
 // Calculate the AIC
-double logit_aic (vector<double> &y, vector<double> &n, vector<double> &mu) {
+double logit_aic (vector<double> &y, vector<double> &mu) {
 	vector<double> m;
-	bool is_n = false;
-	for (unsigned int i = 0; i < n.size(); i++) {
-		if (n[i] > 1) {
-			is_n = true;
-			break;
-		}
-	}
+// 	bool is_n = false;
+// 	for (unsigned int i = 0; i < n.size(); i++) {
+// 		if (n[i] > 1) {
+// 			is_n = true;
+// 			break;
+// 		}
+// 	}
 	
-	if (is_n) {
-		m = n;
-	} else {
-		for (unsigned int i = 0; i < n.size(); i++) {
-			m.push_back(1);
-		}
+// 	if (is_n) {
+// 		m = n;
+// 	} else {
+	for (unsigned int i = 0; i < y.size(); i++) {
+		m.push_back(1);
 	}
+// 	}
 	
 // 	double sum_m = 0;
 // 	double sum = 0;
@@ -713,11 +713,11 @@ double logit_aic (vector<double> &y, vector<double> &n, vector<double> &mu) {
 	vector<double> m_prod_y;
 	vector<double> m_rounded;
 	
-	for (unsigned int i = 0; i < n.size(); i++) {
+	for (unsigned int i = 0; i < y.size(); i++) {
 		m_prod_y.push_back(round(m[i]*y[i]));
 	}
 	
-	for (unsigned int i = 0; i < n.size(); i++) {
+	for (unsigned int i = 0; i < y.size(); i++) {
 		m_rounded.push_back(round(m[i]));
 	}
 	
@@ -1428,7 +1428,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	printf("Breakpoint 3g\n");
   
   // calculate AIC
-  double aic_model = logit_aic(y, n, mu) + 2*rank;
+  double aic_model = logit_aic(y, mu) + 2*rank;
   
   // DEBUG
 	printf("Breakpoint 3h\n");
