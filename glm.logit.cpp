@@ -1418,6 +1418,9 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   vector<vector<double> > qr = lm.getQr();
 	vector<double> qraux = lm.getQraux();
 	vector<int> pivot = lm.getPivot();
+	
+	// DEBUG
+	printf("Breakpoint 4\n");
   
   fit this_fit(coef, residuals, mu, effects, Rmat, rank, qr, qraux, pivot, lm.getTol(),
   						 eta, dev, aic_model, nulldev, iter, wt, weights, resdf, nulldf, y, 
