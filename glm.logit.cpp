@@ -695,7 +695,7 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 // 		m = n;
 // 	} else {
 	for (unsigned int i = 0; i < y.size(); i++) {
-		m.push_back(1);
+		m.push_back(1.0);
 	}
 // 	}
 	
@@ -711,20 +711,20 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 // 	}
 	
 	vector<double> m_prod_y;
-	vector<double> m_rounded;
+// 	vector<double> m_rounded;
 	
 	for (unsigned int i = 0; i < y.size(); i++) {
 		m_prod_y.push_back(round(m[i]*y[i]));
 	}
 	
-	for (unsigned int i = 0; i < y.size(); i++) {
-		m_rounded.push_back(round(m[i]));
-	}
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		m_rounded.push_back(round(m[i]));
+// 	}
 	
 	// DEBUG
 	printf("Breakpoint Alpha\n");
 	
-	vector<double> db = dbinom(m_prod_y, m_rounded, mu, true);
+	vector<double> db = dbinom(m_prod_y, m, mu, true);
 	
 	// DEBUG
 	printf("Breakpoint Beta\n");
