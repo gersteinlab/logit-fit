@@ -45,7 +45,7 @@ static const double INVEPS = 1/DOUBLE_EPS;
 
 double x_d_omx(double x) {
   if (x < 0 || x > 1) {
-		perror(_("Value %g out of range (0, 1)"), x);
+		fprintf(stderr, "Value %g out of range (0, 1)"), x);
 		exit(1);
 	}
   return x/(1 - x);
@@ -447,7 +447,7 @@ double linkfun (double mu) {
 	return log(mu);
 }
 
-double linkinv (double eta) {
+double linkinv (vector<double> &eta) {
 	double temp = (eta[i] < MTHRESH) ? DOUBLE_EPS : ((eta[i] > THRESH) ? INVEPS : exp(eta[i]));
 	return x_d_opx(temp);
 	// return (max(exp(eta), DBL_MIN));
