@@ -721,7 +721,14 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 		m_rounded.push_back(round(m[i]));
 	}
 	
+	// DEBUG
+	printf("Breakpoint Alpha\n");
+	
 	vector<double> db = dbinom(m_prod_y, m_rounded, mu, true);
+	
+	// DEBUG
+	printf("Breakpoint Beta\n");
+	
 	double sum = 0;
 	for (unsigned int i = 0; i < y.size(); i++) {
 		if (m[i] > 0) {
