@@ -722,7 +722,7 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 // 	}
 	
 	// DEBUG
-	printf("Breakpoint Alpha\n");
+	// printf("Breakpoint Alpha\n");
 // 	for (unsigned int i = 0; i < y.size(); i++) {
 // 		printf("%d: %f\n", i, m_prod_y[i]);
 // 	}
@@ -736,7 +736,7 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 	vector<double> db = dbinom(m_prod_y, m, mu, true);
 	
 	// DEBUG
-	printf("Breakpoint Beta\n");
+	// printf("Breakpoint Beta\n");
 	
 	double sum = 0;
 	for (unsigned int i = 0; i < y.size(); i++) {
@@ -992,7 +992,7 @@ pair <double,double> theta_ml (vector<double> &y, vector<double> &mu, double n, 
 fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 
 	// DEBUG
-	printf("Breakpoint 1\n");
+	// printf("Breakpoint 1\n");
 
 	// Control variables
 	double epsilon = 1e-8;
@@ -1062,7 +1062,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	// exit(0);
 	
 	// DEBUG
-	printf("Breakpoint 2\n");
+	// printf("Breakpoint 2\n");
 	
 	// The iteratively reweighting L.S. iteration
 	int iter = 0;
@@ -1308,7 +1308,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	// printf("Breakpoint Tau\n");
 	
 	// DEBUG
-	printf("Breakpoint 3\n");
+	// printf("Breakpoint 3\n");
 	
 	if (!conv) {
 		fprintf(stderr, "Warning: fitting algorithm did not converge\n");
@@ -1326,7 +1326,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	}
 	
 	// DEBUG
-	printf("Breakpoint 3a\n");
+	// printf("Breakpoint 3a\n");
 	
 	// If X matrix was not full rank then columns were pivoted,
   // hence we need to re-label the names ...
@@ -1338,7 +1338,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   }
   
   // DEBUG
-	printf("Breakpoint 3b\n");
+	// printf("Breakpoint 3b\n");
   
   // update by accurate calculation, including 0-weight cases.
   vector<double> mu_eta_vec = mu_eta(eta);
@@ -1350,7 +1350,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   vector<vector<double> > lm_qr = lm.getQr();
   
   // DEBUG
-	printf("Breakpoint 3c\n");
+	// printf("Breakpoint 3c\n");
   
   int sum_good = 0;
   for (unsigned int i = 0; i < good.size(); i++) {
@@ -1399,7 +1399,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	}
 	
 	// DEBUG
-	printf("Breakpoint 3d\n");
+	// printf("Breakpoint 3d\n");
 	
   vector<double> wt;
   for (unsigned int i = 0; i < y.size(); i++) {
@@ -1417,7 +1417,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   wtdmu = wtdmu/(double)nobs;
   
   // DEBUG
-	printf("Breakpoint 3e\n");
+	// printf("Breakpoint 3e\n");
   
   // Produce a vector version of wtdmu
   vector<double> wtdmu_vec;
@@ -1426,7 +1426,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   }
   
   // DEBUG
-	printf("Breakpoint 3f\n");
+	// printf("Breakpoint 3f\n");
   
   vector<double> nulldev_vec = logit_dev_residuals(y, wtdmu_vec);
   double nulldev = 0.0;
@@ -1441,13 +1441,13 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   int resdf = n_ok - rank;
   
   // DEBUG
-	printf("Breakpoint 3g\n");
+	// printf("Breakpoint 3g\n");
   
   // calculate AIC
   double aic_model = logit_aic(y, mu) + 2*rank;
   
   // DEBUG
-	printf("Breakpoint 3h\n");
+	// printf("Breakpoint 3h\n");
   
   vector<double> effects = lm.getEffects();
   
@@ -1461,7 +1461,7 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	vector<int> pivot = lm.getPivot();
 	
 	// DEBUG
-	printf("Breakpoint 4\n");
+	// printf("Breakpoint 4\n");
   
   fit this_fit(coef, residuals, mu, effects, Rmat, rank, qr, qraux, pivot, lm.getTol(),
   						 eta, dev, aic_model, nulldev, iter, wt, weights, resdf, nulldf, y, 
@@ -1685,7 +1685,7 @@ int main (int argc, char* argv[]) {
 	x_tr.clear();
 	
 	// DEBUG
-	printf("Breakpoint Gamma\n");
+	// printf("Breakpoint Gamma\n");
 	// exit(0);
 	
 	// Do the actual glm_logit fitting
@@ -1853,14 +1853,14 @@ int main (int argc, char* argv[]) {
 	bool_out = (outfit.getBoundary()) ? "true" : "false";
 	printf("%s\n\n", bool_out.c_str());
 	
-	printf("<-- Theta -->\n");
-	printf("%f\n\n", outfit.getTheta());
-	
-	printf("<-- SE Theta -->\n");
-	printf("%f\n\n", outfit.getSETheta());
-	
-	printf("<-- Two Log Likelihood -->\n");
-	printf("%f\n\n", outfit.getTwoLogLik());
+// 	printf("<-- Theta -->\n");
+// 	printf("%f\n\n", outfit.getTheta());
+// 	
+// 	printf("<-- SE Theta -->\n");
+// 	printf("%f\n\n", outfit.getSETheta());
+// 	
+// 	printf("<-- Two Log Likelihood -->\n");
+// 	printf("%f\n\n", outfit.getTwoLogLik());
 	
 	// delete &outfit;
 	
