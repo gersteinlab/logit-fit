@@ -1437,6 +1437,9 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   	weights.push_back(1.0);
   }
   
+  // DEBUG
+	printf("Breakpoint 3h\n");
+  
   vector<vector<double> > qr = lm.getQr();
 	vector<double> qraux = lm.getQraux();
 	vector<int> pivot = lm.getPivot();
