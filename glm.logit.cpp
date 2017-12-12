@@ -724,13 +724,13 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 	// DEBUG
 	printf("Breakpoint Alpha\n");
 	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%f\n", m_prod_y[i]);
+		printf("%d: %f\n", i, m_prod_y[i]);
 	}
 	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%f\n", m[i]);
+		printf("%d: %f\n", i, m[i]);
 	}
 	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%f\n", mu[i]);
+		printf("%d: %f\n", i, mu[i]);
 	}
 	
 	vector<double> db = dbinom(m_prod_y, m, mu, true);
