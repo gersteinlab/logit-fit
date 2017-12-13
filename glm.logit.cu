@@ -1750,7 +1750,7 @@ int main (int argc, char* argv[]) {
 	// fit outfit = glm_fit(y, x);
 	
 	// Output the values of "outfit"
-	double* coefficients = outfit.coefficients;
+	double* coefficients = *outfit.getCoefficients();
 	printf("<-- Coefficients -->\n");
 	for (unsigned int i = 0; i < x.size(); i++) {
 		printf("%f", coefficients[i]);
