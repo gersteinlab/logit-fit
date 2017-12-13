@@ -26,7 +26,17 @@ using namespace std;
 #define NUM_BLOCKS 24
 #define THREADS_PER_BLOCK 128
 
-/* This code is a C++ implementation of a negative binomial fitting function */
+/* This code is a CUDA implementation of a logistic regression fitting function */
+
+inline void GPUassert(cudaError_t code, const char * file, int line, bool Abort=true)
+{
+    if (code != 0) {
+        fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code),file,line);
+        if (Abort) exit(code);
+    }       
+}
+
+#define GPUerrchk(ans) { GPUassert((ans), __FILE__, __LINE__); }
 
 /* Base helper functions and macros */
 #ifndef M_LN_SQRT_2PI
@@ -1657,7 +1667,11 @@ int main (int argc, char* argv[]) {
 	x_gpu_b = (double **)malloc(x.size()*sizeof(double *));
 	for (int i = 0; i < (int)x.size(); i++) {
 		cudaMalloc((void**)&x_gpu_b[i], x[i].size()*sizeof(double));
-		cudaMemcpy(x_gpu_b[i], x[i], x[i].size()*sizeof(double), cudaMemcpyHostToDevice);
+		double *xi = (double *)malloc(x[i].size()*sizeof(double));
+		for (int j = 0; j < (int)x[i].size(); j++) {
+			xi[j] = x[i][j];
+		}
+		cudaMemcpy(x_gpu_b[i], xi, x[i].size()*sizeof(double), cudaMemcpyHostToDevice);
 	}
 	cudaMemcpy(x_gpu, x_gpu_b, x.size()*sizeof(double *), cudaMemcpyHostToDevice);
 	
@@ -1727,7 +1741,7 @@ int main (int argc, char* argv[]) {
 	double* weights_gpu;
 	cudaMalloc((void**)&weights_gpu, y.size()*sizeof(double));
 	fit* outfit;
-	// cudaMalloc((void**)&outfit, sizeof(fit));
+	cudaMalloc((void**)&outfit, sizeof(fit));
 	
 	// Do the actual glm_logit fitting
 	// Launch CUDA kernels
