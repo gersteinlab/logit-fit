@@ -1,10 +1,10 @@
 all: glm.logit
 
 glm.logit: glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o
-	g++ -Wall -o glm.logit glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o
+	nvcc -lineinfo -o glm.logit glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o
 
-glm.logit.o: glm.logit.cpp lmfit.cpp fit.cpp
-	g++ -Wall -c glm.logit.cpp
+glm.logit.o: glm.logit.cu lmfit.cpp fit.cpp
+	nvcc -lineinfo -dc glm.logit.cu lmfit.cpp fit.cpp
 	
 daxpy.o: daxpy.f
 	gfortran -c daxpy.f
