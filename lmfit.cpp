@@ -1,30 +1,30 @@
 /* A data structure for holding the return values of the Cdqrls function */
 class lmfit {
 	private: // Member variables
-		vector<vector<double> > qr;
-		vector<double> coefficients;
-		vector<double> residuals;
-		vector<double> effects;
+		double** qr;
+		double* coefficients;
+		double* residuals;
+		double* effects;
 		int rank;
-		vector<int> pivot;
-		vector<double> qraux;
+		int* pivot;
+		double* qraux;
 		double tol;
 		int pivoted;
 	
 	public: // Set/get methods
-		vector<vector<double> > getQr() {
+		double** getQr() {
 			return qr;
 		}
 		
-		vector<double> getCoefficients() {
+		double* getCoefficients() {
 			return coefficients;
 		}
 		
-		vector<double> getResiduals() {
+		double* getResiduals() {
 			return residuals;
 		}
 		
-		vector<double> getEffects() {
+		double* getEffects() {
 			return effects;
 		}
 		
@@ -32,11 +32,11 @@ class lmfit {
 			return rank;
 		}
 		
-		vector<int> getPivot() {
+		int* getPivot() {
 			return pivot;
 		}
 		
-		vector<double> getQraux() {
+		double* getQraux() {
 			return qraux;
 		}
 		
@@ -48,19 +48,19 @@ class lmfit {
 			return pivoted;
 		}
 		
-		void setQr(vector<vector<double> > &this_qr) {
+		void setQr(double** this_qr) {
 			qr = this_qr;
 		}
 		
-		void setCoefficients(vector<double> &this_coefficients) {
+		void setCoefficients(double* this_coefficients) {
 			coefficients = this_coefficients;
 		}
 		
-		void setResiduals(vector<double> &this_residuals) {
+		void setResiduals(double* this_residuals) {
 			residuals = this_residuals;
 		}
 		
-		void setEffects(vector<double> &this_effects) {
+		void setEffects(double* this_effects) {
 			effects = this_effects;
 		}
 		
@@ -68,11 +68,11 @@ class lmfit {
 			rank = this_rank;
 		}
 		
-		void setPivot(vector<int> &this_pivot) {
+		void setPivot(int* this_pivot) {
 			pivot = this_pivot;
 		}
 		
-		void setQraux(vector<double> &this_qraux) {
+		void setQraux(double* this_qraux) {
 			qraux = this_qraux;
 		}
 		
@@ -84,9 +84,9 @@ class lmfit {
 			pivoted = this_pivoted;
 		}
 		
-		lmfit(vector<vector<double> > &this_qr, vector<double> &this_coefficients, 
-					vector<double> &this_residuals, vector<double> &this_effects, 
-					int this_rank, vector<int> &this_pivot, vector<double> &this_qraux, double this_tol, 
+		lmfit(double** this_qr, double* this_coefficients, 
+					double* this_residuals, double* this_effects, 
+					int this_rank, int* this_pivot, double* this_qraux, double this_tol, 
 					int this_pivoted) {
 							 
 			qr = this_qr;

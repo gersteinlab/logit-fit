@@ -1,26 +1,26 @@
 /* A data structure for holding the return values of the glm.fit function */
 class fit {
 	private: // Member variables
-		vector<double> coefficients;
-		vector<double> residuals;
-		vector<double> fitted_values;
-		vector<double> effects;
-		vector<vector<double> > R;
+		double* coefficients;
+		double* residuals;
+		double* fitted_values;
+		double* effects;
+		double** R;
 		int rank;
-		vector<vector<double> > qr;
-		vector<double> qraux;
-		vector<int> pivot;
+		double** qr;
+		double* qraux;
+		int* pivot;
 		double tol;
-		vector<double> linear_predictors;
+		double* linear_predictors;
 		double deviance;
 		double aic;
 		double null_deviance;
 		int iter;
-		vector<double> weights;
-		vector<double> prior_weights;
+		double* weights;
+		double* prior_weights;
 		int df_residual;
 		int df_null;
-		vector<double> y;
+		double* y;
 		bool converged;
 		bool boundary;
 		double theta;
@@ -28,23 +28,23 @@ class fit {
 		double twologlik;
 		
 		public: // Set/get methods
-			vector<double> getCoefficients() {
+			double* getCoefficients() {
 				return coefficients;
 			}
 			
-			vector<double> getResiduals() {
+			double* getResiduals() {
 				return residuals;
 			}
 			
-			vector<double> getFittedValues() {
+			double* getFittedValues() {
 				return fitted_values;
 			}
 			
-			vector<double> getEffects() {
+			double* getEffects() {
 				return effects;
 			}
 			
-			vector<vector<double> > getR() {
+			double** getR() {
 				return R;
 			}
 			
@@ -52,15 +52,15 @@ class fit {
 				return rank;
 			}
 			
-			vector<vector<double> > getQr() {
+			double** getQr() {
 				return qr;
 			}
 			
-			vector<double> getQraux() {
+			double* getQraux() {
 				return qraux;
 			}
 			
-			vector<int> getPivot() {
+			int* getPivot() {
 				return pivot;
 			}
 			
@@ -68,7 +68,7 @@ class fit {
 				return tol;
 			}
 			
-			vector<double> getLinearPredictors() {
+			double* getLinearPredictors() {
 				return linear_predictors;
 			}
 			
@@ -88,11 +88,11 @@ class fit {
 				return iter;
 			}
 			
-			vector<double> getWeights() {
+			double* getWeights() {
 				return weights;
 			}
 			
-			vector<double> getPriorWeights() {
+			double* getPriorWeights() {
 				return prior_weights;
 			}
 			
@@ -104,7 +104,7 @@ class fit {
 				return df_null;
 			}
 			
-			vector<double> getY() {
+			double* getY() {
 				return y;
 			}
 			
@@ -128,23 +128,23 @@ class fit {
 				return twologlik;
 			}
 			
-			void setCoefficients(vector<double> this_coefficients) {
+			void setCoefficients(double* this_coefficients) {
 				coefficients = this_coefficients;
 			}
 			
-			void setResiduals(vector<double> this_residuals) {
+			void setResiduals(double* this_residuals) {
 				residuals = this_residuals;
 			}
 			
-			void setFittedValues(vector<double> this_fitted_values) {
+			void setFittedValues(double* this_fitted_values) {
 				fitted_values = this_fitted_values;
 			}
 			
-			void setEffects(vector<double> this_effects) {
+			void setEffects(double* this_effects) {
 				effects = this_effects;
 			}
 			
-			void setR(vector<vector<double> > this_R) {
+			void setR(double** this_R) {
 				R = this_R;
 			}
 			
@@ -152,15 +152,15 @@ class fit {
 				rank = this_rank;
 			}
 			
-			void setQr(vector<vector<double> > this_qr) {
+			void setQr(double** this_qr) {
 				qr = this_qr;
 			}
 			
-			void setQraux(vector<double> this_qraux) {
+			void setQraux(double* this_qraux) {
 				qraux = this_qraux;
 			}
 			
-			void setPivot(vector<int> this_pivot) {
+			void setPivot(int* this_pivot) {
 				pivot = this_pivot;
 			}
 			
@@ -168,7 +168,7 @@ class fit {
 				tol = this_tol;
 			}
 			
-			void setLinearPredictors(vector<double> this_linear_predictors) {
+			void setLinearPredictors(double* this_linear_predictors) {
 				linear_predictors = this_linear_predictors;
 			}
 			
@@ -188,11 +188,11 @@ class fit {
 				iter = this_iter;
 			}
 			
-			void setWeights(vector<double> this_weights) {
+			void setWeights(double* this_weights) {
 				weights = this_weights;
 			}
 			
-			void setPriorWeights(vector<double> this_prior_weights) {
+			void setPriorWeights(double* this_prior_weights) {
 				prior_weights = this_prior_weights;
 			}
 			
@@ -204,7 +204,7 @@ class fit {
 				df_null = this_df_null;
 			}
 			
-			void setY(vector<double> this_y) {
+			void setY(double* this_y) {
 				y = this_y;
 			}
 			
@@ -228,13 +228,13 @@ class fit {
 				twologlik = this_twologlik;
 			}
 			
-			fit(vector<double> &this_coefficients, vector<double> &this_residuals,
-							 vector<double> &this_fitted_values, vector<double> &this_effects,
-							 vector<vector<double> > &this_R, int this_rank, vector<vector<double> > &this_qr, vector<double> &this_qraux,
-							 vector<int> &this_pivot, double this_tol, vector<double> &this_linear_predictors, 
+			fit(double* this_coefficients, double* this_residuals,
+							 double* this_fitted_values, double* this_effects,
+							 double** this_R, int this_rank, double** this_qr, double* this_qraux,
+							 int* this_pivot, double this_tol, double* this_linear_predictors, 
 							 double this_deviance, double this_aic, double this_null_deviance, int this_iter, 
-							 vector<double> &this_weights, vector<double> &this_prior_weights,
-							 int this_df_residual, int this_df_null, vector<double> &this_y, bool this_converged,
+							 double* this_weights, double* this_prior_weights,
+							 int this_df_residual, int this_df_null, double* this_y, bool this_converged,
 							 bool this_boundary) {
 				
 				coefficients = this_coefficients;

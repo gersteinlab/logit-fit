@@ -12,6 +12,9 @@
 #include <iostream>
 #include <sys/stat.h>
 #include <errno.h>
+#include <cuda.h>
+#include <curand.h>
+#include <curand_kernel.h>
 
 using namespace std;
 
@@ -20,6 +23,8 @@ using namespace std;
 
 #define STRSIZE 1024
 // #define STRSIZE 256
+#define NUM_BLOCKS 24
+#define THREADS_PER_BLOCK 128
 
 /* This code is a C++ implementation of a negative binomial fitting function */
 
@@ -43,7 +48,7 @@ static const double THRESH = 30.;
 static const double MTHRESH = -30.;
 static const double INVEPS = 1/DOUBLE_EPS;
 
-double x_d_omx(double x) {
+__device__ double x_d_omx(double x) {
   if (x < 0 || x > 1) {
 		fprintf(stderr, "Value %g out of range (0, 1)", x);
 		exit(1);
@@ -51,7 +56,7 @@ double x_d_omx(double x) {
   return x/(1 - x);
 }
 
-double x_d_opx(double x) {return x/(1 + x);}
+__device__ double x_d_opx(double x) {return x/(1 + x);}
 
 int imin2(int x, int y)
 {
@@ -545,61 +550,61 @@ double linkinv (double eta) {
 	// return (max(exp(eta), DBL_MIN));
 }
 
-vector<double> mu_eta (vector<double> &eta) {
-	vector<double> result;
-	for (unsigned int i = 0; i < eta.size(); i++) {
+__device__ void mu_eta (double* eta, double* mu_eta_val, int size) {
+	// vector<double> result;
+	for (unsigned int i = 0; i < size; i++) {
 		double opexp = 1 + exp(eta[i]);
-		result.push_back((eta[i] > THRESH || eta[i] < MTHRESH) ? DOUBLE_EPS : exp(eta[i])/(opexp * opexp));
+		mu_eta_val[i] = ((eta[i] > THRESH || eta[i] < MTHRESH) ? DOUBLE_EPS : exp(eta[i])/(opexp * opexp));
 		// result.push_back(max(exp(eta[i]), DBL_MIN));
 	}
-	return result;
+	// return result;
 }
 
 // Our own dbinom function
-vector<double> dbinom (vector<double> x, vector<double> n, vector<double> p, bool log_p) {
+double* dbinom (double* x, double* n, double* p, bool log_p, int size) {
 	
 	// Error checking
-	for (unsigned int i = 0; i < p.size(); i++) {
+	for (unsigned int i = 0; i < size; i++) {
 		if ((p[i] < 0) || (p[i] > 1)) {
-			perror("p must be between 0 and 1\n");
+			printf("Error in dbinom(): p must be between 0 and 1\n");
 			exit(1);
 		}
 	}
-	for (unsigned int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < size; i++) {
 		if (x[i] < 0) {
-			perror("x must be >=0\n");
+			printf("Error in dbinom(): x must be >=0\n");
 			exit(1);
 		}
 	}
-	for (unsigned int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < size; i++) {
 		if (n[i] < x[i]) {
-			perror("x must be <= than the binomial denominator\n");
+			printf("Error in dbinom(); x must be <= than the binomial denominator\n");
 			exit(1);
 		}
 	}
-	vector<double> q;
-	for (unsigned int i = 0; i < p.size(); i++) {
-		q.push_back(1 - p[i]);
+	double* q = (double *)malloc(size*sizeof(double));
+	for (unsigned int i = 0; i < size; i++) {
+		q[i] = 1 - p[i];
 	}
 	
-	vector<double> result;
+	double* result = (double *)malloc(size*sizeof(double));
 	
-	for (unsigned int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < size; i++) {
 	
 		double lf, lc;
 	
 		if (p[i] == 0) {
-			result.push_back(((x[i] == 0) ? (log_p ? 0. : 1.) : (log_p ? -DBL_MAX : 0.)));
+			result[i] = (((x[i] == 0) ? (log_p ? 0. : 1.) : (log_p ? -DBL_MAX : 0.)));
 			continue;
 		}
 		if (q[i] == 0) {
-			result.push_back(((x[i] == n[i]) ? (log_p ? 0. : 1.) : (log_p ? -DBL_MAX : 0.)));
+			result[i] = (((x[i] == n[i]) ? (log_p ? 0. : 1.) : (log_p ? -DBL_MAX : 0.)));
 			continue;
 		}
 	
 		if (x[i] == 0) {
 			if (n[i] == 0) {
-				result.push_back((log_p ? 0. : 1.));
+				result[i] = ((log_p ? 0. : 1.));
 				continue;
 			}
 			lc = (p[i] < 0.1) ? -bd0(n[i],n[i]*q[i]) - n[i]*p[i] : n[i]*log(q[i]);
@@ -634,17 +639,17 @@ vector<double> dbinom (vector<double> x, vector<double> n, vector<double> p, boo
 /* Logistic binomial helper functions */
 
 // Calculate variance from mu
-vector<double> logit_variance (vector<double> &mu) {
-	vector<double> result;
-	for (unsigned int i = 0; i < mu.size(); i++) {
-		result.push_back(mu[i]*(1-mu[i]));
+__device__ void logit_variance (double* mu, double* varmu, int size) {
+	// vector<double> result;
+	for (unsigned int i = 0; i < size; i++) {
+		varmu[i] = mu[i]*(1-mu[i]);
 	}
-	return result;
+	// return result;
 }
 
 // Returns TRUE if mu vector is within acceptable variance
-bool logit_validmu (vector<double> &mu) {
-	for (unsigned int i = 0; i < mu.size(); i++) {
+__device__ bool logit_validmu (double* mu, int size) {
+	for (unsigned int i = 0; i < size; i++) {
 		if (isinf(mu[i]) || mu[i] <= 0.0 || mu[i] >= 1.0) {
 			return false;
 		}
@@ -657,16 +662,16 @@ double y_log_y (double y, double mu) {
 }
 
 // Return deviance residuals
-vector<double> logit_dev_residuals (vector<double> &y, vector<double> &mu) {
-	vector<double> result;
+__device__ void logit_dev_residuals (double* y, double* mu, double* dev, int size) {
+	// vector<double> result;
 	
 	// int i;
-	unsigned int n = y.size();
-	unsigned int lmu = mu.size();
+	unsigned int n = size;
+	unsigned int lmu = size;
 	// int nprot = 1;
 	
 	for (unsigned int i = 0; i < n; i++) {
-		result.push_back(y[i]);
+		dev[i] = y[i];
 	}
 	
 	if (lmu != n && lmu != 1) {
@@ -674,15 +679,15 @@ vector<double> logit_dev_residuals (vector<double> &y, vector<double> &mu) {
 		exit(1);
 	}
 	
-	for (int i = 0; i < (int)n; i++) {
-		result[i] = 2 * (y_log_y(y[i], mu[i]) + y_log_y(1 - y[i], 1 - mu[i]));
+	for (int i = 0; i < n; i++) {
+		dev[i] = 2 * (y_log_y(y[i], mu[i]) + y_log_y(1 - y[i], 1 - mu[i]));
 	}
-	return result;
+	// return result;
 }
 
 // Calculate the AIC
-double logit_aic (vector<double> &y, vector<double> &mu) {
-	vector<double> m;
+double logit_aic (double* y, double* mu, int size) {
+	// vector<double> m;
 // 	bool is_n = false;
 // 	for (unsigned int i = 0; i < n.size(); i++) {
 // 		if (n[i] > 1) {
@@ -694,9 +699,9 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 // 	if (is_n) {
 // 		m = n;
 // 	} else {
-	for (unsigned int i = 0; i < y.size(); i++) {
-		m.push_back(1.0);
-	}
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		m.push_back(1.0);
+// 	}
 // 	}
 	
 // 	double sum_m = 0;
@@ -710,11 +715,11 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 // 		}
 // 	}
 	
-	vector<double> m_prod_y;
+	double* m_prod_y = (double *)malloc(size*sizeof(double));;
 // 	vector<double> m_rounded;
 	
-	for (unsigned int i = 0; i < y.size(); i++) {
-		m_prod_y.push_back(round(m[i]*y[i]));
+	for (unsigned int i = 0; i < size; i++) {
+		m_prod_y[i] = round(y[i]);
 	}
 	
 // 	for (unsigned int i = 0; i < y.size(); i++) {
@@ -733,16 +738,16 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 // 		printf("%d: %f\n", i, mu[i]);
 // 	}
 	
-	vector<double> db = dbinom(m_prod_y, m, mu, true);
+	double* db = dbinom(m_prod_y, m, mu, true, size);
 	
 	// DEBUG
 	// printf("Breakpoint Beta\n");
 	
 	double sum = 0;
-	for (unsigned int i = 0; i < y.size(); i++) {
-		if (m[i] > 0) {
-			sum += 1/m[i]*db[i];
-		}
+	for (unsigned int i = 0; i < size; i++) {
+// 		if (m[i] > 0) {
+		sum += db[i];
+// 		}
 	}
 	
 	return -2*sum;
@@ -763,7 +768,7 @@ double logit_aic (vector<double> &y, vector<double> &mu) {
 // 	// Reduce x
 // 	dqrdc2(x,n,n,p,tol,k,qraux,jpvt,work);
 
-lmfit Cdqrls(vector<vector<double> > &x, vector<double> &y, double tol, bool chk) {
+lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size, int x_size) {
 	
 	// double ans;
 	double *qr;
@@ -780,17 +785,17 @@ lmfit Cdqrls(vector<vector<double> > &x, vector<double> &y, double tol, bool chk
 	double rtol = tol;
 	double *work;
 	
-	n = (int)x[0].size();
-	p = (int)x.size();
+	n = y_size; // x[0].size
+	p = x_size; // x.size
 	
 	// Sanity checks
-	if (n != (int)y.size()) {
-		printf("Error: Dimensions of \'x\' (%d,%d) and \'y\' (%d) do not match", n, p, (int)y.size());
-		exit(1);
-	}
+// 	if (n != (int)y.size()) {
+// 		printf("Error: Dimensions of \'x\' (%d,%d) and \'y\' (%d) do not match", n, p, (int)y.size());
+// 		exit(1);
+// 	}
 	
-	for (unsigned int i = 0; i < x.size(); i++) {
-		for (unsigned int j = 0; j < y.size(); j++) {
+	for (int i = 0; i < p; i++) {
+		for (int j = 0; j < n; j++) {
 			if (isinf(x[i][j])) {
 				printf("Error: NA/NaN/Inf in \'x\' matrix: (%d,%d)\n", i, j);
 				exit(1);
@@ -798,7 +803,7 @@ lmfit Cdqrls(vector<vector<double> > &x, vector<double> &y, double tol, bool chk
 		}
 	}
 	
-	for (unsigned int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < p; i++) {
 		if (isinf(y[i])) {
 			printf("Error: NA/NaN/Inf in \'y\' vector: element %d\n", i);
 			exit(1);
@@ -810,8 +815,8 @@ lmfit Cdqrls(vector<vector<double> > &x, vector<double> &y, double tol, bool chk
 	// Use column-major order for Fortran
 	int flat_size = n*p;
 	qr = (double *)malloc(flat_size*sizeof(double));
-	for (int i = 0; i < (int)x.size(); i++) {
-		for (int j = 0; j < (int)x[i].size(); j++) {
+	for (int i = 0; i < p; i++) {
+		for (int j = 0; j < n; j++) {
 			qr[i*n+j] = x[i][j];
 		}
 	}
@@ -876,47 +881,56 @@ lmfit Cdqrls(vector<vector<double> > &x, vector<double> &y, double tol, bool chk
 // 		}
 // 	}
 // 	exit(0);
+
+	// Re-encode as a double** matrix
+	double** qr_new = (double **)malloc(p*sizeof(double *));
+	for (int i = 0; i < p; i++) {
+		qr_new[i] = (double *)malloc(n*sizeof(double));
+		for (int j = 0; j < n; j++) {
+			qr_new[i][j] = qr[i*n+j];
+		}
+	}
 	
 	// Re-encode in C++ vectors
-	vector<vector<double> > qr_vec;
-	for (int i = 0; i < (int)x.size(); i++) {
-		vector<double> temp;
-		for (int j = 0; j < (int)x[i].size(); j++) {
-			temp.push_back(qr[i*n+j]);
-		}
-		qr_vec.push_back(temp);
-	}
+// 	vector<vector<double> > qr_vec;
+// 	for (int i = 0; i < (int)x.size(); i++) {
+// 		vector<double> temp;
+// 		for (int j = 0; j < (int)x[i].size(); j++) {
+// 			temp.push_back(qr[i*n+j]);
+// 		}
+// 		qr_vec.push_back(temp);
+// 	}
 	
 	// DEBUG
 	// printf("Breakpoint Molto\n");
 	// exit(0);
 	
-	vector<double> coefficients_vec;
-	for (int i = 0; i < p; i++) {
-		coefficients_vec.push_back(coefficients[i]);
-	}
+// 	vector<double> coefficients_vec;
+// 	for (int i = 0; i < p; i++) {
+// 		coefficients_vec.push_back(coefficients[i]);
+// 	}
+// 	
+// 	vector<double> residuals_vec;
+// 	for (int i = 0; i < (int)y.size(); i++) {
+// 		residuals_vec.push_back(residuals[i]);
+// 	}
+// 	
+// 	vector<double> effects_vec;
+// 	for (int i = 0; i < (int)y.size(); i++) {
+// 		effects_vec.push_back(effects[i]);
+// 	}
+// 	
+// 	vector<int> pivot_vec;
+// 	for (int i = 0; i < p; i++) {
+// 		pivot_vec.push_back(pivot[i]);
+// 	}
+// 	
+// 	vector<double> qraux_vec;
+// 	for (int i = 0; i < p; i++) {
+// 		qraux_vec.push_back(qraux[i]);
+// 	}
 	
-	vector<double> residuals_vec;
-	for (int i = 0; i < (int)y.size(); i++) {
-		residuals_vec.push_back(residuals[i]);
-	}
-	
-	vector<double> effects_vec;
-	for (int i = 0; i < (int)y.size(); i++) {
-		effects_vec.push_back(effects[i]);
-	}
-	
-	vector<int> pivot_vec;
-	for (int i = 0; i < p; i++) {
-		pivot_vec.push_back(pivot[i]);
-	}
-	
-	vector<double> qraux_vec;
-	for (int i = 0; i < p; i++) {
-		qraux_vec.push_back(qraux[i]);
-	}
-	
-	lmfit lm1 (qr_vec, coefficients_vec, residuals_vec, effects_vec, rank, pivot_vec, qraux_vec, tol, pivoted);
+	lmfit lm1 (qr_new, coefficients, residuals, effects, rank, pivot, qraux, tol, pivoted);
 	
 	// DEBUG
 	// printf("Breakpoint Eta\n");
@@ -989,7 +1003,7 @@ pair <double,double> theta_ml (vector<double> &y, vector<double> &mu, double n, 
  * This is really a pared down glm_fit that only implements the portion needed
  * for the logistic regression fit
  */
-fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
+__device__ fit glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm_pivot, bool* good, double* mu, double* eta, double* devold_vec, double* coef, double* coefold, double* w, double* varmu, double* mu_eta_val, double* z, double* prefit_y, double** prefit_x, double* lm_coefficients, double* start, double* residuals, double** Rmat, double* wt, double* wtdmu_vec, double* weights, fit* outfit) {
 
 	// DEBUG
 	// printf("Breakpoint 1\n");
@@ -1000,61 +1014,62 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	
 	// Setup variables
 	bool conv = false;
-	int nobs = (int)y.size();
-	int nvars = (int)x.size();
+	int nobs = *y_size;
+	int nvars = *x_size;
 	
-	vector<int> lm_pivot;
-	vector<bool> good;
+// 	vector<int> lm_pivot;
+// 	vector<bool> good;
 	
 	// Eta always valid
 	
 	// Initialize the mu's
-	vector<double> mu;
-	vector<double> n;
-	for (unsigned int i = 0; i < y.size(); i++) {
+	// vector<double> mu;
+	// vector<double> n;
+	for (unsigned int i = 0; i < nobs; i++) {
 		if (y[i] < 0) {
 			printf("Error: negative values not allowed for the negative binomial model. Exiting.\n");
 			exit(1);
 		}
-		n.push_back(1.0);
-		mu.push_back((y[i] + 0.5)/2);
+		// n.push_back(1.0);
+		mu[i] = ((y[i] + 0.5)/2);
 	}
 	
 	// Initialize the eta's
-	vector<double> eta;
+	// vector<double> eta;
 // 	if (etastart.size() == 0) {
-	for (unsigned int i = 0; i < mu.size(); i++) {
-		eta.push_back(log(x_d_omx(mu[i])));
+	for (unsigned int i = 0; i < nobs; i++) {
+		eta[i] = log(x_d_omx(mu[i]));
 	}
 // 	} else {
 // 		eta = etastart;
 // 	}
 	
-	for (unsigned int i = 0; i < eta.size(); i++) {
+	for (unsigned int i = 0; i < nobs; i++) {
 		double tmp = (eta[i] < MTHRESH) ? DOUBLE_EPS : ((eta[i] > THRESH) ? INVEPS : exp(eta[i]));
 		mu[i] = x_d_opx(tmp);
 	}
 		
-	if (!logit_validmu(mu)) {
+	if (!logit_validmu(mu, nobs)) {
 		printf("Invalid starting mu detected. Exiting.\n");
 		exit(1);
 	}
 	
 	// calculate initial deviance and coefficient
-	vector<double> devold_vec = logit_dev_residuals(y, mu);
+	logit_dev_residuals(y, mu, devold_vec, nobs);
 	double devold = 0.0;
-	for (unsigned int i = 0; i < devold_vec.size(); i++) {
+	for (unsigned int i = 0; i < nobs; i++) {
 		devold += devold_vec[i];
 	}
 	
 	bool boundary = false;
 	
 	// Coefficient vector declarations
-	vector<double> coef;
-	vector<double> coefold;
+// 	vector<double> coef;
+// 	vector<double> coefold;
+	coefold[0] = -INFINITY;
 	
 	lmfit lm;
-	vector<double> w;
+// 	vector<double> w;
 	double dev;
 	
 	// DEBUG
@@ -1071,8 +1086,8 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 		// DEBUG
 		// printf("Iter: %d\n", iter);
 		
-		vector<double> varmu = logit_variance(mu);
-		for (unsigned int j = 0; j < varmu.size(); j++) {
+		vector<double> varmu = logit_variance(mu, varmu, nobs);
+		for (unsigned int j = 0; j < nobs; j++) {
 			if (isnan(varmu[j])) {
 				printf("NaNs in the mu variance: cannot proceed. Exiting.\n");
 				exit(1);
@@ -1081,8 +1096,8 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 				exit(1);
 			}
 		}
-		vector<double> mu_eta_val = mu_eta(eta);
-		for (unsigned int j = 0; j < mu_eta_val.size(); j++) {
+		mu_eta(eta, mu_eta_val, nobs);
+		for (unsigned int j = 0; j < nobs; j++) {
 			if (isnan(mu_eta_val[j])) {
 				printf("NaNs in the d(mu)/d(eta)\n");
 				exit(1);
@@ -1090,53 +1105,53 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 		}
 		
 		// Save the good ones (i.e. the ones where mu_eta_val is nonzero)
-		good.clear();
+		// good.clear();
 		unsigned int num_false = 0;
-		for (unsigned int i = 0; i < mu_eta_val.size(); i++) {
+		for (unsigned int i = 0; i < nobs; i++) {
 			if (mu_eta_val[i] != 0) {
-				good.push_back(true);
+				good.[i] = true;
 			} else {
-				good.push_back(false);
+				good[i] = false;
 				num_false++;
 			}
 		}
 		
-		if (num_false == good.size()) { // All not good
+		if (num_false == nobs) { // All not good
 			conv = false;
-			fprintf(stderr, "No observations informative at iteration %d\n", iter);
+			printf("Error: No observations informative at iteration %d\n", iter);
 			break;
 		}
 		
-		vector<double> z;
-		for (unsigned int j = 0; j < y.size(); j++) {
+		// vector<double> z;
+		for (unsigned int j = 0; j < nobs; j++) {
 			if (good[j] == true) {
 				double this_val = eta[j] + (y[j] - mu[j])/mu_eta_val[j];
-				z.push_back(this_val);
+				z[j] = this_val;
 			}
 		}
 		// vector<double> w;
-		for (unsigned int j = 0; j < y.size(); j++) {
+		for (unsigned int j = 0; j < nobs; j++) {
 			if (good[j] == true) {
 				double this_val = sqrt(pow(mu_eta_val[j],2.0))/varmu[j];
-				w.push_back(this_val);
+				w[j] = this_val;
 			}
 		}
 		
 		// Set up dot products for Cdqrls
-		vector<vector<double> > prefit_x;
-		vector<double> prefit_y;
-		for (unsigned int j = 0; j < x.size(); j++) {
-			vector<double> temp;
-			for (unsigned int k = 0; k < y.size(); k++) {
-				if (good[k] == true) {
-					temp.push_back(x[j][k] * w[k]);
-				}
+		// vector<vector<double> > prefit_x;
+		// vector<double> prefit_y;
+		for (unsigned int j = 0; j < nvars; j++) {
+			// vector<double> temp;
+			for (unsigned int k = 0; k < nobs; k++) {
+				// if (good[k] == true) { MIGHT NEED TO CHANGE THIS
+					prefit_x[j][k] = x[j][k] * w[k];
+				// }
 			}
-			prefit_x.push_back(temp);
+			// prefit_x.push_back(temp);
 		}
 		
 		for (unsigned int j = 0; j < z.size(); j++) {
-			prefit_y.push_back(z[j] * w[j]);
+			prefit_y[j] = z[j] * w[j];
 		}
 		
 		// if (iter > 0) {
@@ -1147,13 +1162,13 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 		// printf("Breakpoint Upsilon 2\n");
 		// exit(0);
 		
-		lm = Cdqrls(prefit_x, prefit_y, min(1e-7, epsilon/1000), false);
+		lm = Cdqrls(prefit_x, prefit_y, min(1e-7, epsilon/1000), false, nobs, nvars);
 		
 		// DEBUG
 		// printf("Breakpoint Tau 2\n");
 		// exit(0);
 		
-		vector<double> lm_coefficients = lm.getCoefficients();
+		lm_coefficients = lm.getCoefficients();
 		for (int j = 0; j < nvars; j++) {
 			if (isinf(lm_coefficients[j])) {
 				conv = false;
@@ -1170,41 +1185,41 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 		
 		// calculate updated values of eta and mu with the new coef
 		lm_pivot = lm.getPivot();
-		vector<double> start; // (nvars,0.0);
+		// vector<double> start; // (nvars,0.0);
 		for (int j = 0; j < nvars; j++) {
 			// This code not necessary: if (lm_pivot[j]) {
-				start.push_back(lm_coefficients[lm_pivot[j]-1]);
+				start[j] = lm_coefficients[lm_pivot[j]-1];
 			// }
 		}
 		
 		// New eta needs a matrix calculation
-		vector<double> new_eta;
+		// vector<double> new_eta;
 		for (int j = 0; j < nobs; j++) {
 			double new_eta_one = 0.0;
 			for (int k = 0; k < nvars; k++) {
 				new_eta_one += x[k][j] * start[k];
 			}
-			new_eta.push_back(new_eta_one);
+			eta[j] = new_eta_one;
 		}
-		eta = new_eta;
+		// eta = new_eta;
 		
-		vector<double> new_mu;
+		// vector<double> new_mu;
 		for (unsigned int j = 0; j < eta.size(); j++) {
-			new_mu.push_back(linkinv(eta[j]));
+			mu[j] = linkinv(eta[j]);
 		}
-		mu = new_mu;
+		// mu = new_mu;
 		
-		vector<double> dev_vec = logit_dev_residuals(y, mu);
+		vector<double> dev_vec = logit_dev_residuals(y, mu, devold_vec, nobs);
 		dev = 0.0;
-		for (unsigned int j = 0; j < dev_vec.size(); j++) {
-			dev += dev_vec[j];
+		for (unsigned int j = 0; j < devold_vec.size(); j++) {
+			dev += devold_vec[j];
 		}
 		
 		// check for divergence
 		boundary = false;
 		
 		if (isinf(dev)) {
-			if (coefold.size() == 0) {
+			if (coefold[0] == -INFINITY) {
 				printf("Error: divergence in function fitting. No valid set of ");
 				printf("coefficients has been found. Exiting.\n");
 				exit(1);
@@ -1217,77 +1232,77 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 				}
 				ii++;
 				// Element-wise addition
-				for (unsigned int j = 0; j < start.size(); j++) {
+				for (unsigned int j = 0; j < nvars; j++) {
 					start[j] = (start[j] + coefold[j])/2;
 				}
 					
 				// New eta needs a matrix calculation
-				new_eta.clear();
+				// new_eta.clear();
 				for (int j = 0; j < nobs; j++) {
 					double new_eta_one = 0.0;
 					for (int k = 0; k < nvars; k++) {
 						new_eta_one += x[k][j] * start[k];
 					}
-					new_eta.push_back(new_eta_one);
+					eta[j] = new_eta_one;
 				}
-				eta = new_eta;
+				// eta = new_eta;
 				
-				new_mu.clear();
-				for (unsigned int j = 0; j < eta.size(); j++) {
-					new_mu.push_back(linkinv(eta[j]));
+				// new_mu.clear();
+				for (unsigned int j = 0; j < nobs; j++) {
+					mu[j] = linkinv(eta[j]);
 				}
-				mu = new_mu;
+				// mu = new_mu;
 				
-				vector<double> dev_vec = logit_dev_residuals(y, mu);
+				logit_dev_residuals(y, mu, devold_vec, nobs);
 				dev = 0.0;
-				for (unsigned int j = 0; j < dev_vec.size(); j++) {
-					dev += dev_vec[j];
+				for (unsigned int j = 0; j < devold_vec.size(); j++) {
+					dev += devold_vec[j];
 				}
 			}
 			boundary = true;
 		}
 		
 		// check for fitted values outside the domain
-		if (!logit_validmu(mu)) {
-			if (coefold.size() == 0) {
+		if (!logit_validmu(mu, nobs)) {
+			if (coefold[0] == -INFINITY) {
 				printf("Error: Fitted mu is outside the valid domain. No valid set of ");
 				printf("coefficients has been found. Exiting.\n");
 				exit(1);
 			}
 			int ii = 1;
-			while (!logit_validmu(mu)) {
+			while (!logit_validmu(mu, nobs)) {
 				if (ii > maxit) {
 					printf("Error: Inner loop 2; cannot correct step size\n");
 					exit(1);
 				}
 				ii++;
 				// Element-wise addition
-				for (unsigned int j = 0; j < start.size(); j++) {
+				for (unsigned int j = 0; j < nvars; j++) {
 					start[j] = (start[j] + coefold[j])/2;
 				}
 				
 				// New eta needs a matrix calculation
-				new_eta.clear();
+				// new_eta.clear();
 				for (int j = 0; j < nobs; j++) {
 					double new_eta_one = 0.0;
 					for (int k = 0; k < nvars; k++) {
 						new_eta_one += x[k][j] * start[k];
 					}
-					new_eta.push_back(new_eta_one);
+					eta[j] = new_eta_one;
 				}
-				eta = new_eta;
+				// eta = new_eta;
 				
-				new_mu.clear();
-				for (unsigned int j = 0; j < eta.size(); j++) {
-					new_mu.push_back(linkinv(eta[j]));
+				// new_mu.clear();
+				for (unsigned int j = 0; j < nobs; j++) {
+					mu[j] = linkinv(eta[j]);
 				}
-				mu = new_mu;
+				// mu = new_mu;
 			}
 			boundary = true;
-			vector<double> dev_vec = logit_dev_residuals(y, mu);
+			logit_dev_residuals(y, mu, devold_vec, nobs);
 			dev = 0.0;
-			for (unsigned int j = 0; j < dev_vec.size(); j++) {
-				dev += dev_vec[j];
+			for (unsigned int j = 0; j < devold_vec.size(); j++) {
+				dev += devold_vec[j];
 			}
 		}
 		
@@ -1318,9 +1333,9 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	}
 	// Binomial family check
 	double eps = 10*epsilon;
-	for (unsigned int i = 0; i < mu.size(); i++) {
+	for (unsigned int i = 0; i < nobs; i++) {
 		if ((mu[i] > 1-eps) || (mu[i] < eps)) {
-			fprintf(stderr, "Warning: Fitted probabilities numerically 0 or 1 occurred\n");
+			printf("Warning: Fitted probabilities numerically 0 or 1 occurred\n");
 			break;
 		}
 	}
@@ -1341,77 +1356,77 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	// printf("Breakpoint 3b\n");
   
   // update by accurate calculation, including 0-weight cases.
-  vector<double> mu_eta_vec = mu_eta(eta);
-  vector<double> residuals;
-  for (unsigned int i = 0; i < y.size(); i++) {
-  	double temp = (y[i] - mu[i])/mu_eta_vec[i];
-  	residuals.push_back(temp);
+  mu_eta(eta, mu_eta_val, nobs);
+  // vector<double> residuals;
+  for (unsigned int i = 0; i < nobs; i++) {
+  	double temp = (y[i] - mu[i])/mu_eta_val[i];
+  	residuals[i] = temp;
   }
-  vector<vector<double> > lm_qr = lm.getQr();
+  double** lm_qr = lm.getQr();
   
   // DEBUG
 	// printf("Breakpoint 3c\n");
   
   int sum_good = 0;
-  for (unsigned int i = 0; i < good.size(); i++) {
+  for (unsigned int i = 0; i < nobs; i++) {
   	if (good[i] == true) {
   		sum_good++;
   	}
   }
   int nr = min(sum_good, nvars);
-  vector<vector<double> > Rmat;
+  // vector<vector<double> > Rmat;
   if (nr < nvars) {
   	for (unsigned int i = 0; i < (unsigned int)nvars; i++) {
-  		vector<double> temp;
+  		// vector<double> temp;
   		if (i < (unsigned int)nr) {
   			for (unsigned int j = 0; j < (unsigned int)nvars; j++) {
   				if (i > j) {
-						temp.push_back(0.0);
+						Rmat[i][j] = 0.0;
 					} else {
-						temp.push_back(lm_qr[i][j]);
+						Rmat[i][j] = lm_qr[i][j];
 					}
 				}
   		} else {
 				for (unsigned int j = 0; j < (unsigned int)nvars; j++) {
 					if (i == j) {
-						temp.push_back(1.0);
+						Rmat[i][j] = 1.0;
 					} else {
-						temp.push_back(0.0);
+						Rmat[i][j] = 0.0;
 					}
 				}
 			}
-			Rmat.push_back(temp);
+			// Rmat.push_back(temp);
 		}
   	
   } else {
   
 		for (unsigned int i = 0; i < (unsigned int)nvars; i++) {
-			vector<double> temp;
+			// vector<double> temp;
 			for (unsigned int j = 0; j < (unsigned int)nvars; j++) {
 				if (i > j) {
-					temp.push_back(0.0);
+					Rmat[i][j] = 0.0;
 				} else {
-					temp.push_back(lm_qr[i][j]);
+					Rmat[i][j] = lm_qr[i][j];
 				}
 			}
-			Rmat.push_back(temp);
+			// Rmat.push_back(temp);
 		}
 	}
 	
 	// DEBUG
 	// printf("Breakpoint 3d\n");
 	
-  vector<double> wt;
-  for (unsigned int i = 0; i < y.size(); i++) {
+  // vector<double> wt;
+  for (unsigned int i = 0; i < nobs; i++) {
   	if (good[i]) {
-  		wt.push_back(pow(w[i],2.0));
+  		wt[i] = pow(w[i],2.0);
   	} else {
-  		wt.push_back(0.0);
+  		wt[i] = 0.0;
   	}
   }
   // calculate null deviance -- corrected in glm() if offset and intercept
   double wtdmu = 0.0;
-  for (unsigned int i = 0; i < y.size(); i++) {
+  for (unsigned int i = 0; i < nobs; i++) {
   	wtdmu += y[i];
   }
   wtdmu = wtdmu/(double)nobs;
@@ -1420,18 +1435,18 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	// printf("Breakpoint 3e\n");
   
   // Produce a vector version of wtdmu
-  vector<double> wtdmu_vec;
-  for (unsigned int i = 0; i < y.size(); i++) {
-  	wtdmu_vec.push_back(wtdmu);
+  // vector<double> wtdmu_vec;
+  for (unsigned int i = 0; i < nobs; i++) {
+  	wtdmu_vec[i] = wtdmu;
   }
   
   // DEBUG
 	// printf("Breakpoint 3f\n");
   
-  vector<double> nulldev_vec = logit_dev_residuals(y, wtdmu_vec);
+  logit_dev_residuals(y, wtdmu_vec, devold_vec, nobs);
   double nulldev = 0.0;
-  for (unsigned int i = 0; i < nulldev_vec.size(); i++) {
-  	nulldev += nulldev_vec[i];
+  for (unsigned int i = 0; i < nobs; i++) {
+  	nulldev += devold_vec[i];
   }
   
   // calculate df
@@ -1444,21 +1459,21 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
 	// printf("Breakpoint 3g\n");
   
   // calculate AIC
-  double aic_model = logit_aic(y, mu) + 2*rank;
+  double aic_model = logit_aic(y, mu, nobs) + 2*rank;
   
   // DEBUG
 	// printf("Breakpoint 3h\n");
   
-  vector<double> effects = lm.getEffects();
+  double* effects = lm.getEffects();
   
-  vector<double> weights;
-  for (int i = 0; i < (int)y.size(); i++) {
-  	weights.push_back(1.0);
+  // vector<double> weights;
+  for (int i = 0; i < nobs; i++) {
+  	weights[i] = 1.0;
   }
   
-  vector<vector<double> > qr = lm.getQr();
-	vector<double> qraux = lm.getQraux();
-	vector<int> pivot = lm.getPivot();
+  double** qr = lm.getQr();
+	double* qraux = lm.getQraux();
+	int* pivot = lm.getPivot();
 	
 	// DEBUG
 	// printf("Breakpoint 4\n");
@@ -1467,81 +1482,19 @@ fit glm_fit (vector<double> &y, vector<vector<double> > &x) {
   						 eta, dev, aic_model, nulldev, iter, wt, weights, resdf, nulldf, y, 
   						 conv, boundary);
   // delete &lm;
-  return this_fit;
+  outfit = this_fit;
 }
 
-/* The actual function. Can be called from main, or from other packages */
-// fit glm_logit (vector<double> &y, vector<vector<double> > &x) {
-// 	// Assume link function is log
-// 	// Exclude model frame building since we will be conducting those operations manually
-// 	// negbin_family(y, x, mu, init_theta);
-// 	
-// 	// Control variables
-// 	double epsilon = 1e-8;
-// 	int maxit = 25;
-// 	
-// 	// Initial fit
-// 	vector<double> vec0;
-// 	
-// 	// DEBUG
-// 	// printf("Breakpoint Upsilon\n");
-// 	// exit(0);
-// 	
-// 	fit this_fit = glm_fit(y, x, init_theta, vec0);
-// 	
-// 	// DEBUG
-// 	// printf("Breakpoint Tau\n");
-// 	// exit(0);
-// 	
-// 	vector<double> mu = this_fit.getFittedValues();
-// 	pair <double,double> theta_ret = theta_ml(y, mu, (int)y.size(), 25);
-// 	double th = theta_ret.first;
-// 	double theta = th;
-// 	int n = (int)y.size();
-// 	
-// 	int iter = 0;
-// 	double d1 = sqrt(2 * max(1, this_fit.getDFResidual()));
-// 	double del = 1.0;
-// 	double d2 = 1.0;
-// 	// g refers to the link function
-// 	double Lm = loglik(n, th, mu, y);
-// 	double Lm0 = Lm + 2 * d1;
-// 	fit cur_fit;
-// 	
-// 	// DEBUG
-// 	// printf("Breakpoint Alpha\n");
-// 	// exit(0);
-// 	
-// 	while ((iter < maxit) && (abs(Lm0 - Lm)/d1 + abs(del)/d2) > epsilon) {
-// 		vector<double> eta;
-// 		for (unsigned int i = 0; i < mu.size(); i++) {
-// 			eta.push_back(linkfun(mu[i]));
-// 		}
-// 		cur_fit = glm_fit(y, x, theta, eta);
-// 		double t0 = th;
-// 		theta_ret = theta_ml(y, mu, (int)y.size(), 25);
-// 		th = theta_ret.first;
-// 		theta = th;
-// 		mu = this_fit.getFittedValues();
-// 		del = t0 - th;
-// 		Lm0 = Lm;
-// 		Lm = loglik(n, th, mu, y);
-// 		
-// 		iter++;
-// 	}
-// 	
-// 	// DEBUG
-// 	// printf("Breakpoint Beta\n");
-// 	
-// 	if (iter > maxit) {
-// 		printf("Warning: alternation limit reached\n");
-// 	}
-// 	cur_fit.setTheta(th);
-// 	cur_fit.setSETheta(theta_ret.second);
-// 	cur_fit.setTwoLogLik(2 * Lm);
-// 	cur_fit.setAIC((-1)*cur_fit.getTwoLogLik() + 2 * (double)cur_fit.getRank() + 2);
-// 	return cur_fit;
-// }
+__global__ void apportionWork(double* y_gpu, double** x_gpu, int* y_size, int* x_size, int* lm_pivot_gpu, bool* good_gpu, double* mu_gpu, double* eta_gpu, double* devold_vec_gpu, double* coef_gpu, double* coefold_gpu, double* w_gpu, double* varmu_gpu, double* mu_eta_gpu, double* z_gpu, double* prefit_y_gpu, double** prefit_x_gpu, double* lm_coefficients_gpu, double* start_gpu, double* residuals_gpu, double** Rmat_gpu, double* wt_gpu, double* wtdmu_vec_gpu, double* weights_gpu, fit* outfit) {
+	
+	// Which thread am I?
+	int tid = threadIdx.x + blockIdx.x * blockDim.x;
+	
+	// For now, we're just going to have thread 0 run a logistic regression
+	if (tid == 0) {
+		glm_fit(y_gpu, x_gpu, y_size, x_size, lm_pivot_gpu, good_gpu, mu_gpu, eta_gpu, devold_vec_gpu, coef_gpu, coefold_gpu, w_gpu, varmu_gpu, mu_eta_gpu, z_gpu, prefit_y_gpu, prefit_x_gpu, lm_coefficients_gpu, start_gpu, residuals_gpu, Rmat_gpu, wt_gpu, wtdmu_vec_gpu, weights_gpu, outfit);
+	}
+}
 
 /* Main function */
 int main (int argc, char* argv[]) {
@@ -1688,60 +1641,150 @@ int main (int argc, char* argv[]) {
 	// printf("Breakpoint Gamma\n");
 	// exit(0);
 	
+	// CUDA stuff
+	double *y_cpu = (double *)malloc(y.size()*sizeof(double));
+	for (unsigned int i = 0; i < y.size(); i++) {
+		y_cpu[i] = y[i];
+	}
+	
+	double *y_gpu;
+	cudaMalloc((void**)&y_gpu, y.size()*sizeof(double));
+	cudaMemcpy(y_gpu, y_cpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	
+	double **x_gpu, **x_gpu_b;
+	cudaMalloc((void**)&x_gpu, x.size()*sizeof(double *));
+	x_gpu_b = (double **)malloc(x.size()*sizeof(double *));
+	for (int i = 0; i < (int)x.size(); i++) {
+		cudaMalloc((void**)&x_gpu_b[i], x[i].size()*sizeof(double));
+		cudaMemcpy(x_gpu_b[i], x[i], x[i].size()*sizeof(double), cudaMemcpyHostToDevice);
+	}
+	cudaMemcpy(x_gpu, x_gpu_b, x.size()*sizeof(double *), cudaMemcpyHostToDevice);
+	
+	int y_size_cpu = (int)y.size();
+	int *y_size;
+	cudaMalloc(y_size, sizeof(int));
+	cudaMemcpy(y_size, &y_size_cpu, sizeof(int), cudaMemcpyHostToDevice);
+	int x_size_cpu = (int)x.size();
+	int *x_size;
+	cudaMalloc(x_size, sizeof(int));
+	cudaMemcpy(x_size, &x_size_cpu, sizeof(int), cudaMemcpyHostToDevice);
+	
+	int *lm_pivot_gpu;
+	cudaMalloc((void**)&lm_pivot_gpu, y.size()*sizeof(int), cudaMemcpyHostToDevice);
+	bool *good_gpu;
+	cudaMalloc((void**)&good_gpu, y.size()*sizeof(bool), cudaMemcpyHostToDevice);
+	double *mu_gpu;
+	cudaMalloc((void**)&mu_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	double *eta_gpu;
+	cudaMalloc((void**)&eta_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	double *devold_vec_gpu;
+	cudaMalloc((void**)&devold_vec_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	double *coef_gpu;
+	cudaMalloc((void**)&coef_gpu, x.size()*sizeof(double), cudaMemcpyHostToDevice);
+	double *coefold_gpu;
+	cudaMalloc((void**)&coefold_gpu, x.size()*sizeof(double), cudaMemcpyHostToDevice);
+	double *w_gpu;
+	cudaMalloc((void**)&w_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	double *varmu_gpu;
+	cudaMalloc((void**)&varmu_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	double *mu_eta_gpu;
+	cudaMalloc((void**)&mu_eta_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	double *z_gpu;
+	cudaMalloc((void**)&z_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	
+	double *prefit_y_gpu;
+	cudaMalloc((void**)&prefit_y_gpu, y.size()*sizeof(double));
+	
+	double **prefit_x_gpu, **prefit_x_gpu_b;
+	cudaMalloc((void**)&prefit_x_gpu, x[0].size()*sizeof(double *));
+	prefit_x_gpu_b = (double **)malloc(x[0].size()*sizeof(double *));
+	for (int i = 0; i < (int)x.size(); i++) {
+		cudaMalloc((void**)&prefit_x_gpu_b[i], x.size()*sizeof(double));
+		// cudaMemcpy(prefit_x_gpu_b[i], x[i], x[i].size()*sizeof(double), cudaMemcpyHostToDevice);
+	}
+	cudaMemcpy(prefit_x_gpu, prefit_x_gpu_b, x[0].size()*sizeof(double *), cudaMemcpyHostToDevice);
+	
+	double* lm_coefficients_gpu;
+	cudaMalloc((void**)&lm_coefficients_gpu, x.size()*sizeof(double));
+	double* start_gpu;
+	cudaMalloc((void**)&start_gpu, x.size()*sizeof(double));
+	double* residuals_gpu;
+	cudaMalloc((void**)&residuals_gpu, y.size()*sizeof(double));
+	
+	double **Rmat_gpu, **Rmat_gpu_b;
+	cudaMalloc((void**)&Rmat_gpu, x.size()*sizeof(double *));
+	Rmat_gpu_b = (double **)malloc(x.size()*sizeof(double *));
+	for (int i = 0; i < (int)x.size(); i++) {
+		cudaMalloc((void**)&Rmat_gpu_b[i], x.size()*sizeof(double));
+	}
+	cudaMemcpy(Rmat_gpu, Rmat_gpu_b, x.size()*sizeof(double *), cudaMemcpyHostToDevice);
+	
+	double* wt_gpu;
+	cudaMalloc((void**)&wt_gpu, y.size()*sizeof(double));
+	double* wtdmu_vec_gpu;
+	cudaMalloc((void**)&wtdmu_vec_gpu, y.size()*sizeof(double));
+	double* weights_gpu;
+	cudaMalloc((void**)&weights_gpu, y.size()*sizeof(double));
+	fit* outfit;
+	// cudaMalloc((void**)&outfit, sizeof(fit));
+	
 	// Do the actual glm_logit fitting
-	fit outfit = glm_fit(y, x);
+	// Launch CUDA kernels
+	apportionWork<<<NUM_BLOCKS, THREADS_PER_BLOCK>>>(y_gpu, x_gpu, y_size, x_size, lm_pivot_gpu, good_gpu, mu_gpu, eta_gpu, devold_vec_gpu, coef_gpu, coefold_gpu, w_gpu, varmu_gpu, mu_eta_gpu, z_gpu, prefit_y_gpu, prefit_x_gpu, lm_coefficients_gpu, start_gpu, residuals_gpu, Rmat_gpu, wt_gpu, wtdmu_vec_gpu, weights_gpu, outfit);
+	GPUerrchk(cudaPeekAtLastError());
+	// fit outfit = glm_fit(y, x);
 	
 	// Output the values of "outfit"
-	vector<double> coefficients = outfit.getCoefficients();
+	double* coefficients = outfit.getCoefficients();
 	printf("<-- Coefficients -->\n");
-	for (unsigned int i = 0; i < coefficients.size(); i++) {
+	for (unsigned int i = 0; i < nvars; i++) {
 		printf("%f", coefficients[i]);
-		if (i != coefficients.size()-1) {
+		if (i != nvars-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
 		}
 	}
 	
-	vector<double> residuals = outfit.getResiduals();
+	double* residuals = outfit.getResiduals();
 	printf("<-- Residuals -->\n");
-	for (unsigned int i = 0; i < residuals.size(); i++) {
+	for (unsigned int i = 0; i < nobs; i++) {
 		printf("%f", residuals[i]);
-		if (i != residuals.size()-1) {
+		if (i != nobs-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
 		}
 	}
 	
-	vector<double> fitted_values = outfit.getFittedValues();
+	double* fitted_values = outfit.getFittedValues();
 	printf("<-- Fitted Values -->\n");
-	for (unsigned int i = 0; i < fitted_values.size(); i++) {
+	for (unsigned int i = 0; i < nobs; i++) {
 		printf("%f", fitted_values[i]);
-		if (i != fitted_values.size()-1) {
+		if (i != nobs-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
 		}
 	}
 	
-	vector<double> effects = outfit.getEffects();
+	double* effects = outfit.getEffects();
 	printf("<-- Effects -->\n");
-	for (unsigned int i = 0; i < effects.size(); i++) {
+	for (unsigned int i = 0; i < nobs; i++) {
 		printf("%f", effects[i]);
-		if (i != effects.size()-1) {
+		if (i != nobs-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
 		}
 	}
 	
-	vector<vector<double> > R = outfit.getR();
+	double** R = outfit.getR();
 	printf("<-- R -->\n");
-	for (unsigned int i = 0; i < R.size(); i++) {
-		for (unsigned int j = 0; j < R[i].size(); j++) {
+	for (unsigned int i = 0; i < nvars; i++) {
+		for (unsigned int j = 0; j < nvars; j++) {
 			printf("%f", R[i][j]);
-			if (j != R[i].size()-1) {
+			if (j != nvars-1) {
 				printf("\t");
 			} else {
 				printf("\n");
@@ -1754,12 +1797,12 @@ int main (int argc, char* argv[]) {
 	printf("<-- Rank -->\n");
 	printf("%d\n\n", outfit.getRank());
 	
-	vector<vector<double> > qr = outfit.getQr();
+	double** qr = outfit.getQr();
 	printf("<-- QR matrix -->\n");
-	for (int i = 0; i < (int)x.size(); i++) {
-		for (int j = 0; j < (int)x[i].size(); i++) {
+	for (int i = 0; i < nvars; i++) {
+		for (int j = 0; j < nobs; i++) {
 			printf("%f", qr[i][j]);
-			if (j != (int)x[i].size()-1) {
+			if (j != nobs-1) {
 				printf("\t");
 			} else {
 				printf("\n");
@@ -1771,9 +1814,9 @@ int main (int argc, char* argv[]) {
 	
 	vector<double> qraux = outfit.getQraux();
 	printf("<-- Qraux -->\n");
-	for (int i = 0; i < (int)x.size(); i++) {
+	for (int i = 0; i < nvars; i++) {
 		printf("%f", qraux[i]);
-		if (i != (int)x.size()-1) {
+		if (i != nvars-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
@@ -1782,9 +1825,9 @@ int main (int argc, char* argv[]) {
 	
 	vector<int> pivot = outfit.getPivot();
 	printf("<-- Pivot vector -->\n");
-	for (int i = 0; i < (int)x.size(); i++) {
+	for (int i = 0; i < nvars; i++) {
 		printf("%d", pivot[i]);
-		if (i != (int)x.size()-1) {
+		if (i != nvars-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
@@ -1794,11 +1837,11 @@ int main (int argc, char* argv[]) {
 	printf("<-- Tol -->\n");
 	printf("%f\n\n", outfit.getTol());
 	
-	vector<double> linear_predictors = outfit.getLinearPredictors();
+	double* linear_predictors = outfit.getLinearPredictors();
 	printf("<-- Linear Predictors -->\n");
-	for (unsigned int i = 0; i < linear_predictors.size(); i++) {
+	for (unsigned int i = 0; i < nobs; i++) {
 		printf("%f", linear_predictors[i]);
-		if (i != linear_predictors.size()-1) {
+		if (i != nobs-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
@@ -1817,22 +1860,22 @@ int main (int argc, char* argv[]) {
 	printf("<-- Number of iterations -->\n");
 	printf("%d\n\n", outfit.getIter());
 	
-	vector<double> weights = outfit.getWeights();
+	double* weights = outfit.getWeights();
 	printf("<-- Weights -->\n");
-	for (unsigned int i = 0; i < weights.size(); i++) {
+	for (unsigned int i = 0; i < nobs; i++) {
 		printf("%f", weights[i]);
-		if (i != weights.size()-1) {
+		if (i != nobs-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
 		}
 	}
 	
-	vector<double> prior_weights = outfit.getPriorWeights();
+	double* prior_weights = outfit.getPriorWeights();
 	printf("<-- Prior Weights -->\n");
-	for (unsigned int i = 0; i < prior_weights.size(); i++) {
+	for (unsigned int i = 0; i < nobs; i++) {
 		printf("%f", prior_weights[i]);
-		if (i != prior_weights.size()-1) {
+		if (i != nobs-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
