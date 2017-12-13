@@ -50,7 +50,7 @@ static const double INVEPS = 1/DOUBLE_EPS;
 
 __device__ double x_d_omx(double x) {
   if (x < 0 || x > 1) {
-		fprintf(stderr, "Value %g out of range (0, 1)", x);
+		printf("Error: Value %g out of range (0, 1)", x);
 		exit(1);
 	}
   return x/(1 - x);
@@ -608,16 +608,16 @@ double* dbinom (double* x, double* n, double* p, bool log_p, int size) {
 				continue;
 			}
 			lc = (p[i] < 0.1) ? -bd0(n[i],n[i]*q[i]) - n[i]*p[i] : n[i]*log(q[i]);
-			result.push_back(( (log_p	?  (lc)	 : exp(lc)) ));
+			result[i] = (( (log_p	?  (lc)	 : exp(lc)) ));
 			continue;
 		}
 		if (x[i] == n[i]) {
 			lc = (q[i] < 0.1) ? -bd0(n[i],n[i]*p[i]) - n[i]*q[i] : n[i]*log(p[i]);
-			result.push_back(( (log_p	?  (lc)	 : exp(lc)) ));
+			result[i] = (( (log_p	?  (lc)	 : exp(lc)) ));
 			continue;
 		}
 		if (x[i] < 0 || x[i] > n[i]) {
-			result.push_back(( (log_p ? -DBL_MAX : 0.) ));
+			result[i] = (( (log_p ? -DBL_MAX : 0.) ));
 			continue;
 		}
 	
@@ -631,7 +631,7 @@ double* dbinom (double* x, double* n, double* p, bool log_p, int size) {
 		 * -- following is much better for  x << n : */
 		lf = M_LN_2PI + log(x[i]) + log1p(- x[i]/n[i]);
 
-		result.push_back(R_D_exp((lc - 0.5*lf), log_p));
+		result[i] = (R_D_exp((lc - 0.5*lf), log_p));
 	}
 	return result;
 }
@@ -675,7 +675,7 @@ __device__ void logit_dev_residuals (double* y, double* mu, double* dev, int siz
 	}
 	
 	if (lmu != n && lmu != 1) {
-		fprintf(stderr, "Error: Argument mu must be a numeric vector of length 1 or length %d\n", n);
+		printf("Error: Argument mu must be a numeric vector of length 1 or length %d\n", n);
 		exit(1);
 	}
 	
@@ -699,9 +699,10 @@ double logit_aic (double* y, double* mu, int size) {
 // 	if (is_n) {
 // 		m = n;
 // 	} else {
-// 	for (unsigned int i = 0; i < y.size(); i++) {
-// 		m.push_back(1.0);
-// 	}
+	double* m = (double *)malloc(size*sizeof(double));
+	for (unsigned int i = 0; i < size; i++) {
+		m[i] = 1.0;
+	}
 // 	}
 	
 // 	double sum_m = 0;
@@ -824,7 +825,7 @@ lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size, int x_size
 	// Turn y into a matrix for use in Fortran
 	// y_for = y;
 	y_for = (double *)malloc(n*sizeof(double));
-	for (unsigned int i = 0; i < y.size(); i++) {
+	for (unsigned int i = 0; i < y_size; i++) {
 		y_for[i] = y[i];
 	}
 	
@@ -835,14 +836,14 @@ lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size, int x_size
 	}
 
 	// residuals = y;
-	residuals = (double *)malloc((int)y.size()*sizeof(double));
-	for (unsigned int i = 0; i < y.size(); i++) {
+	residuals = (double *)malloc((int)y_size*sizeof(double));
+	for (unsigned int i = 0; i < y_size; i++) {
 		residuals[i] = y[i];
 	}
 	
 	// effects = y;
-	effects = (double *)malloc((int)y.size()*sizeof(double));
-	for (unsigned int i = 0; i < y.size(); i++) {
+	effects = (double *)malloc((int)y_size*sizeof(double));
+	for (unsigned int i = 0; i < y_size; i++) {
 		effects[i] = y[i];
 	}
 	
@@ -1003,7 +1004,7 @@ pair <double,double> theta_ml (vector<double> &y, vector<double> &mu, double n, 
  * This is really a pared down glm_fit that only implements the portion needed
  * for the logistic regression fit
  */
-__device__ fit glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm_pivot, bool* good, double* mu, double* eta, double* devold_vec, double* coef, double* coefold, double* w, double* varmu, double* mu_eta_val, double* z, double* prefit_y, double** prefit_x, double* lm_coefficients, double* start, double* residuals, double** Rmat, double* wt, double* wtdmu_vec, double* weights, fit* outfit) {
+__device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm_pivot, bool* good, double* mu, double* eta, double* devold_vec, double* coef, double* coefold, double* w, double* varmu, double* mu_eta_val, double* z, double* prefit_y, double** prefit_x, double* lm_coefficients, double* start, double* residuals, double** Rmat, double* wt, double* wtdmu_vec, double* weights, fit* outfit) {
 
 	// DEBUG
 	// printf("Breakpoint 1\n");
@@ -1086,7 +1087,7 @@ __device__ fit glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm
 		// DEBUG
 		// printf("Iter: %d\n", iter);
 		
-		vector<double> varmu = logit_variance(mu, varmu, nobs);
+		logit_variance(mu, varmu, nobs);
 		for (unsigned int j = 0; j < nobs; j++) {
 			if (isnan(varmu[j])) {
 				printf("NaNs in the mu variance: cannot proceed. Exiting.\n");
@@ -1109,7 +1110,7 @@ __device__ fit glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm
 		unsigned int num_false = 0;
 		for (unsigned int i = 0; i < nobs; i++) {
 			if (mu_eta_val[i] != 0) {
-				good.[i] = true;
+				good[i] = true;
 			} else {
 				good[i] = false;
 				num_false++;
@@ -1150,7 +1151,7 @@ __device__ fit glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm
 			// prefit_x.push_back(temp);
 		}
 		
-		for (unsigned int j = 0; j < z.size(); j++) {
+		for (unsigned int j = 0; j < nobs; j++) {
 			prefit_y[j] = z[j] * w[j];
 		}
 		
@@ -1204,14 +1205,14 @@ __device__ fit glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm
 		// eta = new_eta;
 		
 		// vector<double> new_mu;
-		for (unsigned int j = 0; j < eta.size(); j++) {
+		for (unsigned int j = 0; j < nobs; j++) {
 			mu[j] = linkinv(eta[j]);
 		}
 		// mu = new_mu;
 		
-		vector<double> dev_vec = logit_dev_residuals(y, mu, devold_vec, nobs);
+		logit_dev_residuals(y, mu, devold_vec, nobs);
 		dev = 0.0;
-		for (unsigned int j = 0; j < devold_vec.size(); j++) {
+		for (unsigned int j = 0; j < nobs; j++) {
 			dev += devold_vec[j];
 		}
 		
@@ -1255,7 +1256,7 @@ __device__ fit glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm
 				
 				logit_dev_residuals(y, mu, devold_vec, nobs);
 				dev = 0.0;
-				for (unsigned int j = 0; j < devold_vec.size(); j++) {
+				for (unsigned int j = 0; j < nobs; j++) {
 					dev += devold_vec[j];
 				}
 			}
@@ -1301,7 +1302,7 @@ __device__ fit glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm
 			boundary = true;
 			logit_dev_residuals(y, mu, devold_vec, nobs);
 			dev = 0.0;
-			for (unsigned int j = 0; j < devold_vec.size(); j++) {
+			for (unsigned int j = 0; j < nobs; j++) {
 				dev += devold_vec[j];
 			}
 		}
@@ -1326,10 +1327,10 @@ __device__ fit glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm
 	// printf("Breakpoint 3\n");
 	
 	if (!conv) {
-		fprintf(stderr, "Warning: fitting algorithm did not converge\n");
+		printf("Warning: fitting algorithm did not converge\n");
 	}
 	if (boundary) {
-		fprintf(stderr, "Warning: fitting algorithm stopped at boundary value\n");
+		printf("Warning: fitting algorithm stopped at boundary value\n");
 	}
 	// Binomial family check
 	double eps = 10*epsilon;
@@ -1482,7 +1483,7 @@ __device__ fit glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm
   						 eta, dev, aic_model, nulldev, iter, wt, weights, resdf, nulldf, y, 
   						 conv, boundary);
   // delete &lm;
-  outfit = this_fit;
+  *outfit = this_fit;
 }
 
 __global__ void apportionWork(double* y_gpu, double** x_gpu, int* y_size, int* x_size, int* lm_pivot_gpu, bool* good_gpu, double* mu_gpu, double* eta_gpu, double* devold_vec_gpu, double* coef_gpu, double* coefold_gpu, double* w_gpu, double* varmu_gpu, double* mu_eta_gpu, double* z_gpu, double* prefit_y_gpu, double** prefit_x_gpu, double* lm_coefficients_gpu, double* start_gpu, double* residuals_gpu, double** Rmat_gpu, double* wt_gpu, double* wtdmu_vec_gpu, double* weights_gpu, fit* outfit) {
@@ -1603,7 +1604,7 @@ int main (int argc, char* argv[]) {
 			
 			// Check if we've reached the end-of-line
 // 			if (ws_index+1 >= line.length()) {
-				break;
+// 				break;
 // 			} else {
 				line = line.substr(ws_index+1);
 // 			}
@@ -1662,35 +1663,35 @@ int main (int argc, char* argv[]) {
 	
 	int y_size_cpu = (int)y.size();
 	int *y_size;
-	cudaMalloc(y_size, sizeof(int));
+	cudaMalloc((void**)&y_size, sizeof(int));
 	cudaMemcpy(y_size, &y_size_cpu, sizeof(int), cudaMemcpyHostToDevice);
 	int x_size_cpu = (int)x.size();
 	int *x_size;
-	cudaMalloc(x_size, sizeof(int));
+	cudaMalloc((void**)&x_size, sizeof(int));
 	cudaMemcpy(x_size, &x_size_cpu, sizeof(int), cudaMemcpyHostToDevice);
 	
 	int *lm_pivot_gpu;
-	cudaMalloc((void**)&lm_pivot_gpu, y.size()*sizeof(int), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&lm_pivot_gpu, y.size()*sizeof(int));
 	bool *good_gpu;
-	cudaMalloc((void**)&good_gpu, y.size()*sizeof(bool), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&good_gpu, y.size()*sizeof(bool));
 	double *mu_gpu;
-	cudaMalloc((void**)&mu_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&mu_gpu, y.size()*sizeof(double));
 	double *eta_gpu;
-	cudaMalloc((void**)&eta_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&eta_gpu, y.size()*sizeof(double));
 	double *devold_vec_gpu;
-	cudaMalloc((void**)&devold_vec_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&devold_vec_gpu, y.size()*sizeof(double));
 	double *coef_gpu;
-	cudaMalloc((void**)&coef_gpu, x.size()*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&coef_gpu, x.size()*sizeof(double));
 	double *coefold_gpu;
-	cudaMalloc((void**)&coefold_gpu, x.size()*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&coefold_gpu, x.size()*sizeof(double));
 	double *w_gpu;
-	cudaMalloc((void**)&w_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&w_gpu, y.size()*sizeof(double));
 	double *varmu_gpu;
-	cudaMalloc((void**)&varmu_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&varmu_gpu, y.size()*sizeof(double));
 	double *mu_eta_gpu;
-	cudaMalloc((void**)&mu_eta_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&mu_eta_gpu, y.size()*sizeof(double));
 	double *z_gpu;
-	cudaMalloc((void**)&z_gpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&z_gpu, y.size()*sizeof(double));
 	
 	double *prefit_y_gpu;
 	cudaMalloc((void**)&prefit_y_gpu, y.size()*sizeof(double));
@@ -1737,9 +1738,9 @@ int main (int argc, char* argv[]) {
 	// Output the values of "outfit"
 	double* coefficients = outfit.getCoefficients();
 	printf("<-- Coefficients -->\n");
-	for (unsigned int i = 0; i < nvars; i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		printf("%f", coefficients[i]);
-		if (i != nvars-1) {
+		if (i != x.size()-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
@@ -1748,9 +1749,9 @@ int main (int argc, char* argv[]) {
 	
 	double* residuals = outfit.getResiduals();
 	printf("<-- Residuals -->\n");
-	for (unsigned int i = 0; i < nobs; i++) {
+	for (unsigned int i = 0; i < y.size(); i++) {
 		printf("%f", residuals[i]);
-		if (i != nobs-1) {
+		if (i != y.size()-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
@@ -1759,9 +1760,9 @@ int main (int argc, char* argv[]) {
 	
 	double* fitted_values = outfit.getFittedValues();
 	printf("<-- Fitted Values -->\n");
-	for (unsigned int i = 0; i < nobs; i++) {
+	for (unsigned int i = 0; i < y.size(); i++) {
 		printf("%f", fitted_values[i]);
-		if (i != nobs-1) {
+		if (i != y.size()-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
@@ -1770,9 +1771,9 @@ int main (int argc, char* argv[]) {
 	
 	double* effects = outfit.getEffects();
 	printf("<-- Effects -->\n");
-	for (unsigned int i = 0; i < nobs; i++) {
+	for (unsigned int i = 0; i < y.size(); i++) {
 		printf("%f", effects[i]);
-		if (i != nobs-1) {
+		if (i != y.size()-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
@@ -1781,10 +1782,10 @@ int main (int argc, char* argv[]) {
 	
 	double** R = outfit.getR();
 	printf("<-- R -->\n");
-	for (unsigned int i = 0; i < nvars; i++) {
-		for (unsigned int j = 0; j < nvars; j++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
+		for (unsigned int j = 0; j < x.size(); j++) {
 			printf("%f", R[i][j]);
-			if (j != nvars-1) {
+			if (j != x.size()-1) {
 				printf("\t");
 			} else {
 				printf("\n");
@@ -1799,10 +1800,10 @@ int main (int argc, char* argv[]) {
 	
 	double** qr = outfit.getQr();
 	printf("<-- QR matrix -->\n");
-	for (int i = 0; i < nvars; i++) {
-		for (int j = 0; j < nobs; i++) {
+	for (int i = 0; i < x.size(); i++) {
+		for (int j = 0; j < y.size(); i++) {
 			printf("%f", qr[i][j]);
-			if (j != nobs-1) {
+			if (j != y.size()-1) {
 				printf("\t");
 			} else {
 				printf("\n");
@@ -1814,9 +1815,9 @@ int main (int argc, char* argv[]) {
 	
 	vector<double> qraux = outfit.getQraux();
 	printf("<-- Qraux -->\n");
-	for (int i = 0; i < nvars; i++) {
+	for (int i = 0; i < x.size(); i++) {
 		printf("%f", qraux[i]);
-		if (i != nvars-1) {
+		if (i != x.size()-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
@@ -1825,9 +1826,9 @@ int main (int argc, char* argv[]) {
 	
 	vector<int> pivot = outfit.getPivot();
 	printf("<-- Pivot vector -->\n");
-	for (int i = 0; i < nvars; i++) {
+	for (int i = 0; i < x.size(); i++) {
 		printf("%d", pivot[i]);
-		if (i != nvars-1) {
+		if (i != x.size()-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
@@ -1839,9 +1840,9 @@ int main (int argc, char* argv[]) {
 	
 	double* linear_predictors = outfit.getLinearPredictors();
 	printf("<-- Linear Predictors -->\n");
-	for (unsigned int i = 0; i < nobs; i++) {
+	for (unsigned int i = 0; i < y.size(); i++) {
 		printf("%f", linear_predictors[i]);
-		if (i != nobs-1) {
+		if (i != y.size()-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
@@ -1862,9 +1863,9 @@ int main (int argc, char* argv[]) {
 	
 	double* weights = outfit.getWeights();
 	printf("<-- Weights -->\n");
-	for (unsigned int i = 0; i < nobs; i++) {
+	for (unsigned int i = 0; i < y.size(); i++) {
 		printf("%f", weights[i]);
-		if (i != nobs-1) {
+		if (i != y.size()-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
@@ -1873,9 +1874,9 @@ int main (int argc, char* argv[]) {
 	
 	double* prior_weights = outfit.getPriorWeights();
 	printf("<-- Prior Weights -->\n");
-	for (unsigned int i = 0; i < nobs; i++) {
+	for (unsigned int i = 0; i < y.size(); i++) {
 		printf("%f", prior_weights[i]);
-		if (i != nobs-1) {
+		if (i != y.size()-1) {
 			printf("\t");
 		} else {
 			printf("\n\n");
