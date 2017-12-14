@@ -104,7 +104,7 @@ __device__ static integer c__1 = 1;
     doublereal d__1, d__2;
 
     /* Builtin functions */
-    double d_sign(doublereal *, doublereal *); // sqrt(doublereal);
+    __device__ double d_sign(doublereal *, doublereal *); // sqrt(doublereal);
 
     /* Local variables */
     integer j, l;

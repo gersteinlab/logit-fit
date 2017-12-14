@@ -171,7 +171,7 @@
     logical cr;
     integer ju, kp1;
     logical cxb, cqy;
-    extern doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
+    extern __device__ doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     doublereal temp;
     logical cqty;
