@@ -1780,28 +1780,29 @@ int main (int argc, char* argv[]) {
 		
 		// DEBUG
 		// for (int i = 0; i < 21; i++) {
+		char *line = linebuf;
 		
 		col = 0;
-		while (strcmp(linebuf, "") != 0) {
+		while (strcmp(line, "") != 0) {
 			int i;
-			for (i = 0; i < strlen(linebuf); i++) {
-				if (linebuf[i] == '\t' || linebuf[i] == '\n') {
+			for (i = 0; i < strlen(line); i++) {
+				if (line[i] == '\t' || line[i] == '\n') {
 					break;
 				}
 			}
 			
 			char temp[STRSIZE];
-			strncpy(temp, linebuf, i*sizeof(char));
+			strncpy(temp, line, i*sizeof(char));
 			temp[i] = '\0';
 			x_tr[row][col] = atof(temp);
 			col++;
 			
-			if (linebuf[i] == '\n') {
+			if (line[i] == '\n') {
 				break;
 			} else {
 				char temp2[STRSIZE];
-				strcpy(temp2, linebuf+i+1);
-				linebuf = temp2;
+				strcpy(temp2, line+i+1);
+				line = temp2;
 			}
 		}
 		row++;
