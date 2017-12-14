@@ -6,7 +6,7 @@ all: glm.logit
 	# nvcc -lineinfo -o glm.logit glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o -L/usr/lib64
 
 glm.logit: glm.logit.cu lmfit.cu fit.cpp dqrls.cu daxpy.cu dcopy.cu ddot.cu dnrm2.cu dqrdc.cu dqrdc2.cu dqrsl.cu dscal.cu dswap.cu
-	nvcc -lineinfo -rdc=true -o glm.logit glm.logit.cu lmfit.cu fit.cpp dqrls.cu daxpy.cu dcopy.cu ddot.cu dnrm2.cu dqrdc.cu dqrdc2.cu dqrsl.cu dscal.cu dswap.cu
+	nvcc -lineinfo -rdc=true -o glm.logit glm.logit.cu lmfit.cu fit.cpp dqrls.cu daxpy.cu dcopy.cu ddot.cu dnrm2.cu dqrdc.cu dqrdc2.cu dqrsl.cu dscal.cu dswap.cu /home/fas/gerstein/ll426/scratch/tools/f2c/libf2c.a -lm
 	
 # daxpy.o: daxpy.f
 # 	gfortran -c daxpy.f
