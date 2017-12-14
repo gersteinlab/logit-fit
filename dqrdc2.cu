@@ -14,7 +14,7 @@
 #include "ddot.cuh"
 #include "dnrm2.cuh"
 #include "daxpy.cuh"
-#include "d_sign.cuh"
+// #include "d_sign.cuh"
 
 /* Table of constant values */
 
@@ -215,7 +215,10 @@ L120:
 	    goto L180;
 	}
 	if (x[l + l * x_dim1] != 0.) {
-	    nrmxl = d_sign(&nrmxl, &x[l + l * x_dim1]);
+			double xax;
+			xax = (nrmxl >= 0 ? nrmxl : - nrmxl);
+			nrmxl = ( x[l + l * x_dim1] >= 0 ? xax : -xax);
+	    // nrmxl = d_sign(&nrmxl, &x[l + l * x_dim1]);
 	}
 	i__2 = *n - l + 1;
 	d__1 = 1. / nrmxl;
