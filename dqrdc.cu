@@ -113,16 +113,16 @@ __device__ static integer c__1 = 1;
     doublereal tt;
     integer lp1, lup;
     logical negj;
-//     extern __device__ doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
-// 	    integer *);
+    extern __device__ doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
+	    integer *);
     integer maxj;
     // extern __device__ doublereal dnrm2_(integer *, doublereal *, integer *);
     extern __device__ /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *), dswap_(integer *, doublereal *, integer *, doublereal 
 	    *, integer *);
     logical swapj;
-//     extern __device__ /* Subroutine */ int daxpy_(integer *, doublereal *, doublereal *, 
-// 	    integer *, doublereal *, integer *);
+    extern __device__ /* Subroutine */ int daxpy_(integer *, doublereal *, doublereal *, 
+	    integer *, doublereal *, integer *);
     doublereal nrmxl, maxnrm;
 
 
