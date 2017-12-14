@@ -16,6 +16,16 @@
 
 using namespace std;
 
+#include "daxpy.cu"
+#include "dcopy.cu"
+#include "ddot.cu"
+#include "dnrm2.cu"
+#include "dqrdc.cu"
+#include "dqrdc2.cu"
+#include "dqrsl.cu"
+#include "dscal.cu"
+#include "dswap.cu"
+#include "dqrls.cu"
 #include "lmfit.cu"
 #include "fit.cpp"
 
