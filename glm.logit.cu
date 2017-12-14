@@ -73,7 +73,7 @@ int imin2(int x, int y)
     return (x < y) ? x : y;
 }
 
-double R_D_exp (double x, bool log_p) {
+__device__ double R_D_exp (double x, bool log_p) {
 	return (log_p	? (x)	: exp(x));
 }
 
@@ -93,7 +93,7 @@ double gammln(double xx) {
 	return -tmp+log(2.5066282746310005*ser/x);
 }
 
-double stirlerr(double n) {
+__device__ double stirlerr(double n) {
 
 #define S0 0.083333333333333333333       /* 1/12 */
 #define S1 0.00277777777777777777778     /* 1/360 */
@@ -507,7 +507,7 @@ double trigamma(double x)
     return ans;
 }
 
-double bd0(double x, double np) {
+__device__ double bd0(double x, double np) {
     double ej, s, s1, v;
     int j;
 
@@ -577,19 +577,19 @@ __device__ double* dbinom (double* x, double* n, double* p, bool log_p, int size
 	for (unsigned int i = 0; i < size; i++) {
 		if ((p[i] < 0) || (p[i] > 1)) {
 			printf("Error in dbinom(): p must be between 0 and 1\n");
-			exit(1);
+			asm("trap;");
 		}
 	}
 	for (unsigned int i = 0; i < size; i++) {
 		if (x[i] < 0) {
 			printf("Error in dbinom(): x must be >=0\n");
-			exit(1);
+			asm("trap;");
 		}
 	}
 	for (unsigned int i = 0; i < size; i++) {
 		if (n[i] < x[i]) {
 			printf("Error in dbinom(); x must be <= than the binomial denominator\n");
-			exit(1);
+			asm("trap;");
 		}
 	}
 	double* q = (double *)malloc(size*sizeof(double));
