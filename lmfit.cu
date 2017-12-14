@@ -1,5 +1,5 @@
 /* A data structure for holding the return values of the Cdqrls function */
-__device__ class lmfit {
+class lmfit {
 	private: // Member variables
 		double** qr;
 		double* coefficients;

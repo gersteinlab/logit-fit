@@ -61,7 +61,7 @@ static const double INVEPS = 1/DOUBLE_EPS;
 __device__ double x_d_omx(double x) {
   if (x < 0 || x > 1) {
 		printf("Error: Value %g out of range (0, 1)", x);
-		asm("trap;")
+		asm("trap;");
 	}
   return x/(1 - x);
 }
@@ -686,7 +686,7 @@ __device__ void logit_dev_residuals (double* y, double* mu, double* dev, int siz
 	
 	if (lmu != n && lmu != 1) {
 		printf("Error: Argument mu must be a numeric vector of length 1 or length %d\n", n);
-		asm("trap;")
+		asm("trap;");
 	}
 	
 	for (int i = 0; i < n; i++) {
@@ -1039,7 +1039,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	for (unsigned int i = 0; i < nobs; i++) {
 		if (y[i] < 0) {
 			printf("Error: negative values not allowed for the negative binomial model. Exiting.\n");
-			asm("trap;")
+			asm("trap;");
 		}
 		// n.push_back(1.0);
 		mu[i] = ((y[i] + 0.5)/2);
@@ -1062,7 +1062,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		
 	if (!logit_validmu(mu, nobs)) {
 		printf("Invalid starting mu detected. Exiting.\n");
-		asm("trap;")
+		asm("trap;");
 	}
 	
 	// calculate initial deviance and coefficient
@@ -1101,17 +1101,17 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		for (unsigned int j = 0; j < nobs; j++) {
 			if (isnan(varmu[j])) {
 				printf("NaNs in the mu variance: cannot proceed. Exiting.\n");
-				asm("trap;")
+				asm("trap;");
 			} else if (varmu[j] == 0) {
 				printf("Zeroes in the mu variance: cannot proceed. Exiting.\n");
-				asm("trap;")
+				asm("trap;");
 			}
 		}
 		mu_eta(eta, mu_eta_val, nobs);
 		for (unsigned int j = 0; j < nobs; j++) {
 			if (isnan(mu_eta_val[j])) {
 				printf("NaNs in the d(mu)/d(eta)\n");
-				asm("trap;")
+				asm("trap;");
 			}
 		}
 		
@@ -1191,7 +1191,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		// Stop if not enough parameters
 		if (nobs < lm.getRank()) {
 			printf("Error: X matrix has rank %d, but only %d observation(s).\n", lm.getRank(), nobs);
-			asm("trap;")
+			asm("trap;");
 		}
 		
 		// calculate updated values of eta and mu with the new coef
@@ -1233,13 +1233,13 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 			if (coefold[0] == -INFINITY) {
 				printf("Error: divergence in function fitting. No valid set of ");
 				printf("coefficients has been found. Exiting.\n");
-				asm("trap;")
+				asm("trap;");
 			}
 			int ii = 1;
 			while (isinf(dev)) {
 				if (ii > maxit) {
 					printf("Error: Inner loop 1; cannot correct step size\n");
-					asm("trap;")
+					asm("trap;");
 				}
 				ii++;
 				// Element-wise addition
@@ -1278,13 +1278,13 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 			if (coefold[0] == -INFINITY) {
 				printf("Error: Fitted mu is outside the valid domain. No valid set of ");
 				printf("coefficients has been found. Exiting.\n");
-				asm("trap;")
+				asm("trap;");
 			}
 			int ii = 1;
 			while (!logit_validmu(mu, nobs)) {
 				if (ii > maxit) {
 					printf("Error: Inner loop 2; cannot correct step size\n");
-					asm("trap;")
+					asm("trap;");
 				}
 				ii++;
 				// Element-wise addition
