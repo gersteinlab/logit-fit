@@ -18,7 +18,7 @@
 
 using namespace std;
 
-#include "lmfit.cpp"
+#include "lmfit.cu"
 #include "fit.cpp"
 
 #define STRSIZE 1024
