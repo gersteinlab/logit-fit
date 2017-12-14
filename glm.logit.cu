@@ -5,9 +5,9 @@
 #include <math.h>
 #include <float.h>
 #include <limits.h>
-#include <limits>
-#include <utility>
-#include <iostream>
+// #include <limits>
+// #include <utility>
+// #include <iostream>
 #include <sys/stat.h>
 #include <errno.h>
 #include <cuda.h>
