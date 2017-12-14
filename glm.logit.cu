@@ -1366,7 +1366,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	// If X matrix was not full rank then columns were pivoted,
   // hence we need to re-label the names ...
   lm_pivot = lm.pivot;
-  if (lm.getRank() < nvars) {
+  if (lm.rank < nvars) {
   	for (unsigned int i = lm.rank; i < (unsigned int)nvars; i++) {
   		coef[lm_pivot[i]-1] = 0;
   	}
@@ -1472,7 +1472,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
   // calculate df
   int n_ok = nobs;
   int nulldf = n_ok - 1;
-  int rank = lm.getRank();
+  int rank = lm.rank;
   int resdf = n_ok - rank;
   
   // DEBUG
@@ -1605,7 +1605,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	}
 	
 	printf("<-- Tol -->\n");
-	printf("%f\n\n", lm.getTol());
+	printf("%f\n\n", lm.tol);
 	
 	// double* linear_predictors = outfit.getLinearPredictors();
 	printf("<-- Linear Predictors -->\n");

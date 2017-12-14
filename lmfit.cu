@@ -10,7 +10,7 @@ struct lmfit {
 		double* qraux;
 		double tol;
 		int pivoted;
-}
+};
 	
 // 	public: // Set/get methods
 // 		double** getQr() {
