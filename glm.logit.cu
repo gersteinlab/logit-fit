@@ -1681,12 +1681,12 @@ int main (int argc, char* argv[]) {
 
 	// The response vector (y) file
 	// Each value is listed one per row
-	const char* y_file[STRSIZE];
+	const char y_file[STRSIZE];
 	
  	// The predictor matrix (x) file
  	// Rows are observations, columns are predictor variables
  	// Assumes tab-delimited values
- 	const char* x_file[STRSIZE];
+ 	const char x_file[STRSIZE];
  	
  	// The initial theta to use in fitting
  	// double init_theta;
@@ -1712,8 +1712,8 @@ int main (int argc, char* argv[]) {
  	double y[1024];
  	int ysize = 0;
 	double x[1024][1024];
-	int xsize = 0;
-	int xisize = 0;
+	// int xsize = 0;
+	// int xisize = 0;
 	
 	// Verify files, and import data to memory
 	struct stat ybuf;
@@ -1756,7 +1756,7 @@ int main (int argc, char* argv[]) {
 		fclose(yfile_ptr);
 	} else { // It's an error
 		char errstring[STRSIZE];
-		sprintf(errstring, "Error reading from %s", y_file.c_str());
+		sprintf(errstring, "Error reading from %s", y_file);
 		perror(errstring);
 		return 1;
 	}
@@ -1853,7 +1853,7 @@ int main (int argc, char* argv[]) {
 	
 	// CUDA stuff
 	double *y_cpu = (double *)malloc(ysize*sizeof(double));
-	for (unsigned int i = 0; i < y.size(); i++) {
+	for (unsigned int i = 0; i < ysize; i++) {
 		y_cpu[i] = y[i];
 	}
 	
