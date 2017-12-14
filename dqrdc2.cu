@@ -14,7 +14,7 @@
 
 /* Table of constant values */
 
-// static integer c__1 = 1;
+__device__ static integer c__10 = 1;
 
 
 /*     dqrdc2 uses householder transformations to compute the qr */
@@ -140,7 +140,7 @@
     /* Function Body */
     i__1 = *p;
     for (j = 1; j <= i__1; ++j) {
-	qraux[j] = dnrm2_(n, &x[j * x_dim1 + 1], &c__1);
+	qraux[j] = dnrm2_(n, &x[j * x_dim1 + 1], &c__10);
 	work[j + work_dim1] = qraux[j];
 	work[j + (work_dim1 << 1)] = qraux[j];
 	if (work[j + (work_dim1 << 1)] == 0.) {
@@ -206,7 +206,7 @@ L120:
 /*           compute the householder transformation for column l. */
 
 	i__2 = *n - l + 1;
-	nrmxl = dnrm2_(&i__2, &x[l + l * x_dim1], &c__1);
+	nrmxl = dnrm2_(&i__2, &x[l + l * x_dim1], &c__10);
 	if (nrmxl == 0.) {
 	    goto L180;
 	}
@@ -215,7 +215,7 @@ L120:
 	}
 	i__2 = *n - l + 1;
 	d__1 = 1. / nrmxl;
-	dscal_(&i__2, &d__1, &x[l + l * x_dim1], &c__1);
+	dscal_(&i__2, &d__1, &x[l + l * x_dim1], &c__10);
 	x[l + l * x_dim1] += 1.;
 
 /*              apply the transformation to the remaining columns, */
@@ -228,11 +228,11 @@ L120:
 	i__2 = *p;
 	for (j = lp1; j <= i__2; ++j) {
 	    i__3 = *n - l + 1;
-	    t = -ddot_(&i__3, &x[l + l * x_dim1], &c__1, &x[l + j * x_dim1], &
-		    c__1) / x[l + l * x_dim1];
+	    t = -ddot_(&i__3, &x[l + l * x_dim1], &c__10, &x[l + j * x_dim1], &
+		    c__10) / x[l + l * x_dim1];
 	    i__3 = *n - l + 1;
-	    daxpy_(&i__3, &t, &x[l + l * x_dim1], &c__1, &x[l + j * x_dim1], &
-		    c__1);
+	    daxpy_(&i__3, &t, &x[l + l * x_dim1], &c__10, &x[l + j * x_dim1], &
+		    c__10);
 	    if (qraux[j] == 0.) {
 		goto L150;
 	    }
@@ -256,7 +256,7 @@ L120:
 	    goto L140;
 L130:
 	    i__3 = *n - l;
-	    qraux[j] = dnrm2_(&i__3, &x[l + 1 + j * x_dim1], &c__1);
+	    qraux[j] = dnrm2_(&i__3, &x[l + 1 + j * x_dim1], &c__10);
 	    work[j + work_dim1] = qraux[j];
 L140:
 L150:
