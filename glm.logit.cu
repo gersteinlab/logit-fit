@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <vector>
-#include <string>
 #include <math.h>
 #include <float.h>
 #include <limits.h>
@@ -1683,12 +1681,12 @@ int main (int argc, char* argv[]) {
 
 	// The response vector (y) file
 	// Each value is listed one per row
-	string y_file;
+	char* y_file[STRSIZE];
 	
  	// The predictor matrix (x) file
  	// Rows are observations, columns are predictor variables
  	// Assumes tab-delimited values
- 	string x_file;
+ 	char* x_file[STRSIZE];
  	
  	// The initial theta to use in fitting
  	// double init_theta;
@@ -1702,8 +1700,8 @@ int main (int argc, char* argv[]) {
  		printf("Usage: glm.logit [response file] [predictor file]\n");
  		return 1;
  	} else {
- 		y_file = string(argv[1]);
- 		x_file = string(argv[2]);
+ 		y_file = argv[1];
+ 		x_file = argv[2];
  		// init_theta = atof(argv[3]);
  	}
  	
@@ -1711,13 +1709,16 @@ int main (int argc, char* argv[]) {
  	// printf("Breakpoint Sigma\n");
  	
  	// Data structures for imported data
- 	vector<double> y;
-	vector<vector<double> > x;
+ 	double y[1024];
+ 	int ysize = 0;
+	double x[1024][1024];
+	int xsize = 0;
+	int xisize = 0;
 	
 	// Verify files, and import data to memory
 	struct stat ybuf;
-	if (stat(y_file.c_str(), &ybuf)) { // Report the error and exit
-		printf("Error trying to stat %s: %s\n", y_file.c_str(), strerror(errno));
+	if (stat(y_file, &ybuf)) { // Report the error and exit
+		printf("Error trying to stat %s: %s\n", y_file, strerror(errno));
 		return 1;
 	}
 	// Check that the file is not empty
@@ -1727,8 +1728,8 @@ int main (int argc, char* argv[]) {
 	}
 	
 	struct stat xbuf;
-	if (stat(x_file.c_str(), &xbuf)) { // Report the error and exit
-		printf("Error trying to stat %s: %s\n", x_file.c_str(), strerror(errno));
+	if (stat(x_file, &xbuf)) { // Report the error and exit
+		printf("Error trying to stat %s: %s\n", x_file, strerror(errno));
 		return 1;
 	}
 	// Check that the file is not empty
@@ -1739,14 +1740,16 @@ int main (int argc, char* argv[]) {
 	
 	// Bring response file data into memory
 	char linebuf[STRSIZE];
-	FILE *yfile_ptr = fopen(y_file.c_str(), "r");
+	FILE *yfile_ptr = fopen(y_file, "r");
 	while (fgets(linebuf, STRSIZE, yfile_ptr) != NULL) {
-		string line = string(linebuf);
+		// string line = string(linebuf);
+		linebuf[strlen(linebuf)-1] = '\0';
 		
-		size_t ws_index = line.find_last_of("\n");
-		string in = line.substr(0, ws_index);
+// 		size_t ws_index = line.find_last_of("\n");
+// 		string in = line.substr(0, ws_index);
 		
-		y.push_back(atof(in.c_str()));
+		y[ysize] = atof(linebuf);
+		ysize++;
 	}
 	// Check feof of file
 	if (feof(yfile_ptr)) { // We're good
@@ -1759,17 +1762,19 @@ int main (int argc, char* argv[]) {
 	}
 	
 	// Initial version of x matrix
-	vector<vector<double> > x_tr;
+	double x_tr[1024][1024];
 	
 	// DEBUG
 	// printf("Breakpoint Delta\n");
 	
 	// Bring predictor file data into memory
-	FILE *xfile_ptr = fopen(x_file.c_str(), "r");
+	FILE *xfile_ptr = fopen(x_file, "r");
+	int row = 0;
+	int col = 0;
 	while (fgets(linebuf, STRSIZE, xfile_ptr) != NULL) {
-		string line = string(linebuf);
+		// string line = string(linebuf);
 		
-		vector<double> vec;
+		// vector<double> vec;
 		
 		// DEBUG
 		// printf("Breakpoint Upsilon\n");
@@ -1777,47 +1782,68 @@ int main (int argc, char* argv[]) {
 		// DEBUG
 		// for (int i = 0; i < 21; i++) {
 		
-		while (line != "") {
-			// printf("%s\n", line.c_str()); // DEBUG
-			size_t ws_index = line.find_first_of("\t\n");
-			string in = line.substr(0, ws_index);
-			vec.push_back(atof(in.c_str()));
+		col = 0;
+		while (strcmp(linebuf, "") != 0) {
+			int i;
+			for (i = 0; i < strlen(linebuf), i++) {
+				if (linebuf[i] == '\t' || linebuf[i] == '\n') {
+					break;
+				}
+			}
 			
-			// Check if we've reached the end-of-line
-// 			if (ws_index+1 >= line.length()) {
-// 				break;
-// 			} else {
-				line = line.substr(ws_index+1);
-// 			}
-// 		}
+			char temp[STRSIZE];
+			strncpy(temp, linebuf, i*sizeof(char));
+			temp[i] = '\0';
+			x_tr[row][col] = atof(temp);
+			col++;
+			
+			if (linebuf[i] == '\n') {
+				break;
+			} else {
+				linebuf = &linebuf[i+1];
+			}
 		}
+		row++;
+			// printf("%s\n", line.c_str()); // DEBUG
+// 			size_t ws_index = line.find_first_of("\t\n");
+// 			string in = line.substr(0, ws_index);
+// 			vec.push_back(atof(in.c_str()));
+// 			
+// 			// Check if we've reached the end-of-line
+// // 			if (ws_index+1 >= line.length()) {
+// // 				break;
+// // 			} else {
+// 				line = line.substr(ws_index+1);
+// // 			}
+// // 		}
+// 		}
 		
 		// DEBUG
 		// printf("Breakpoint Tau\n");
 		// exit(0);
 		
-		x_tr.push_back(vec);
+		// x_tr.push_back(vec);
 	}
 	// Check feof of file
 	if (feof(xfile_ptr)) { // We're good
 		fclose(xfile_ptr);
 	} else { // It's an error
 		char errstring[STRSIZE];
-		sprintf(errstring, "Error reading from %s", x_file.c_str());
+		sprintf(errstring, "Error reading from %s", x_file);
 		perror(errstring);
 		return 1;
 	}
 	
 	// Need to transpose the x matrix
-	for (unsigned int i = 0; i < x_tr[0].size(); i++) {
-		vector<double> vec;
-		for (unsigned int j = 0; j < x_tr.size(); j++) {
-			vec.push_back(x_tr[j][i]);
+	for (unsigned int i = 0; i < col; i++) {
+		// vector<double> vec;
+		for (unsigned int j = 0; j < row; j++) {
+			x[i][j] = x_tr[j][i];
 		}
-		x.push_back(vec);
+		// x.push_back(vec);
 	}
 	
-	x_tr.clear();
+	// x_tr.clear();
 	
 	// DEBUG
 	// printf("Breakpoint Gamma\n");
