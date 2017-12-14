@@ -17,12 +17,12 @@
 using namespace std;
 
 #include "f2c.h"
-#include "daxpy.cu"
-#include "dcopy.cu"
-#include "dscal.cu"
-#include "dswap.cu"
-#include "ddot.cu"
-#include "dnrm2.cu"
+#include "daxpy.cuh"
+#include "dcopy.cuh"
+#include "dscal.cuh"
+#include "dswap.cuh"
+#include "ddot.cuh"
+#include "dnrm2.cuh"
 #include "dqrdc.cu"
 #include "dqrdc2.cu"
 #include "dqrsl.cu"
