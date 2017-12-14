@@ -80,7 +80,7 @@ __device__ double R_D_exp (double x, bool log_p) {
 // Returns the value ln[gamma(xx)] for xx > 0.
 __device__ double gammln(double xx) {
 	double x,y,tmp,ser;
-	static double cof[6]={76.18009172947146,-86.50532032941677,
+	double cof[6]={76.18009172947146,-86.50532032941677,
 												24.01409824083091,-1.231739572450155,
 												0.1208650973866179e-2,-0.5395239384953e-5};
 	int j;
@@ -104,7 +104,7 @@ __device__ double stirlerr(double n) {
 /*
   error for 0, 0.5, 1.0, 1.5, ..., 14.5, 15.0.
 */
-    const static double sferr_halves[31] = {
+    const double sferr_halves[31] = {
 	0.0, /* n=0 - wrong, place holder only */
 	0.1534264097200273452913848,  /* 0.5 */
 	0.0810614667953272582196702,  /* 1.0 */
