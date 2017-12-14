@@ -71,8 +71,8 @@ __device__ doublereal ddot_(integer *n, doublereal *dx, integer *incx, doublerea
     doublereal ret_val;
 
     /* Local variables */
-    static integer i__, m, ix, iy, mp1;
-    static doublereal dtemp;
+    integer i__, m, ix, iy, mp1;
+    doublereal dtemp;
 
 
 /*  -- Reference BLAS level1 routine (version 3.4.0) -- */

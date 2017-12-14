@@ -70,7 +70,7 @@
     integer i__1;
 
     /* Local variables */
-    static integer i__, m, ix, iy, mp1;
+    integer i__, m, ix, iy, mp1;
 
 
 /*  -- Reference BLAS level1 routine (version 3.4.0) -- */

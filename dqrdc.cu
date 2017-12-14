@@ -14,7 +14,7 @@
 
 /* Table of constant values */
 
-static integer c__1 = 1;
+__device__ static integer c__1 = 1;
 
 
 /*     dqrdc uses householder transformations to compute the qr */
@@ -104,26 +104,26 @@ static integer c__1 = 1;
     doublereal d__1, d__2;
 
     /* Builtin functions */
-    double d_sign(doublereal *, doublereal *), sqrt(doublereal);
+    double d_sign(doublereal *, doublereal *); // sqrt(doublereal);
 
     /* Local variables */
-    static integer j, l;
-    static doublereal t;
-    static integer jj, jp, pl, pu;
-    static doublereal tt;
-    static integer lp1, lup;
-    static logical negj;
-    extern doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
+    integer j, l;
+    doublereal t;
+    integer jj, jp, pl, pu;
+    doublereal tt;
+    integer lp1, lup;
+    logical negj;
+    extern __device__ doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer maxj;
-    extern doublereal dnrm2_(integer *, doublereal *, integer *);
-    extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
+    integer maxj;
+    extern __device__ doublereal dnrm2_(integer *, doublereal *, integer *);
+    extern __device__ /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *), dswap_(integer *, doublereal *, integer *, doublereal 
 	    *, integer *);
-    static logical swapj;
-    extern /* Subroutine */ int daxpy_(integer *, doublereal *, doublereal *, 
+    logical swapj;
+    extern __device__ /* Subroutine */ int daxpy_(integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *);
-    static doublereal nrmxl, maxnrm;
+    doublereal nrmxl, maxnrm;
 
 
 /*     internal variables */

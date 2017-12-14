@@ -73,11 +73,11 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
     doublereal ret_val, d__1;
 
     /* Builtin functions */
-    double sqrt(doublereal);
+    // double sqrt(doublereal);
 
     /* Local variables */
-    static integer ix;
-    static doublereal ssq, norm, scale, absxi;
+    integer ix;
+    doublereal ssq, norm, scale, absxi;
 
 
 /*  -- Reference BLAS level1 routine (version 3.4.0) -- */

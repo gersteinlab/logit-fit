@@ -14,7 +14,7 @@
 
 /* Table of constant values */
 
-static integer c__1 = 1;
+// static integer c__1 = 1;
 
 
 /*     dqrsl applies the output of dqrdc to compute coordinate */
@@ -164,18 +164,18 @@ static integer c__1 = 1;
     integer x_dim1, x_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j;
-    static doublereal t;
-    static logical cb;
-    static integer jj;
-    static logical cr;
-    static integer ju, kp1;
-    static logical cxb, cqy;
+    integer i__, j;
+    doublereal t;
+    logical cb;
+    integer jj;
+    logical cr;
+    integer ju, kp1;
+    logical cxb, cqy;
     extern doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static doublereal temp;
-    static logical cqty;
-    extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
+    doublereal temp;
+    logical cqty;
+    extern __device__ /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), daxpy_(integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *);
 

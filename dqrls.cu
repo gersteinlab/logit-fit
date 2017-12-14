@@ -14,7 +14,7 @@
 
 /* Table of constant values */
 
-static integer c__1110 = 1110;
+__device__ static integer c__1110 = 1110;
 
 
 /*     dqrfit is a subroutine to compute least squares solutions */
@@ -107,8 +107,8 @@ static integer c__1110 = 1110;
 	    rsd_offset, qty_dim1, qty_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, jj, kk, info;
-    extern /* Subroutine */ int dqrsl_(doublereal *, integer *, integer *, 
+    integer i__, j, jj, kk, info;
+    extern __device__ /* Subroutine */ int dqrsl_(doublereal *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, doublereal *, integer *, integer *), 
 	    dqrdc2_(doublereal *, integer *, integer *, integer *, doublereal 

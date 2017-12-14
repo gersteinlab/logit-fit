@@ -14,7 +14,7 @@
 
 /* Table of constant values */
 
-static integer c__1 = 1;
+// static integer c__1 = 1;
 
 
 /*     dqrdc2 uses householder transformations to compute the qr */
@@ -106,13 +106,13 @@ static integer c__1 = 1;
     doublereal d__1, d__2;
 
     /* Builtin functions */
-    double d_sign(doublereal *, doublereal *), sqrt(doublereal);
+    double d_sign(doublereal *, doublereal *); // sqrt(doublereal);
 
     /* Local variables */
-    static integer i__, j, l;
-    static doublereal t, tt;
-    static integer lp1, lup;
-    static doublereal ttt;
+    integer i__, j, l;
+    doublereal t, tt;
+    integer lp1, lup;
+    doublereal ttt;
     extern doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *), dnrm2_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
