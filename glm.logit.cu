@@ -536,18 +536,18 @@ __device__ double bd0(double x, double np) {
 }
 
 /* A log-likelihood helper function */
-__device__ double loglik (int n, double th, 
-							 const vector<double> &mu, const vector<double> &y) {
-	
-	double sum = 0;
-	unsigned int n1 = (unsigned int)n;
-	for (unsigned int i = 0; i < n1; i++) {
-		sum += (gammln(th+y[i]) - gammln(th) - gammln(y[i]+1) + th * 
-					 log(th) + y[i] * log(mu[i] + (y[i] == 0 ? 1 : 0)) - (th + y[i]) * 
-					 log(th + mu[i]));
-	}
-	return sum;
-}
+// __device__ double loglik (int n, double th, 
+// 							 const vector<double> &mu, const vector<double> &y) {
+// 	
+// 	double sum = 0;
+// 	unsigned int n1 = (unsigned int)n;
+// 	for (unsigned int i = 0; i < n1; i++) {
+// 		sum += (gammln(th+y[i]) - gammln(th) - gammln(y[i]+1) + th * 
+// 					 log(th) + y[i] * log(mu[i] + (y[i] == 0 ? 1 : 0)) - (th + y[i]) * 
+// 					 log(th + mu[i]));
+// 	}
+// 	return sum;
+// }
 
 /* Link functions */
 double linkfun (double mu) {
