@@ -114,9 +114,9 @@ __device__ static integer c__10 = 1;
     integer lp1, lup;
     doublereal ttt;
     extern __device__ doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
-	    integer *); dnrm2_(integer *, doublereal *, integer *);
+	    integer *), dnrm2_(integer *, doublereal *, integer *);
     extern __device__ /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
-	    integer *); daxpy_(integer *, doublereal *, doublereal *, integer 
+	    integer *), daxpy_(integer *, doublereal *, doublereal *, integer 
 	    *, doublereal *, integer *);
     doublereal nrmxl;
 
