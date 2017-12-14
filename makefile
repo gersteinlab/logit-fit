@@ -2,7 +2,7 @@ all: glm.logit
 
 glm.logit: glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o
 	# gfortran -o glm.logit glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o -lgcc -L/gpfs/apps/hpc/GPU/cuda_7.5.18/lib64/ -I/gpfs/apps/hpc/GPU/cuda_7.5.18/include/ -lcuda -lcudart
-	gfortran -o glm.logit glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o -lgcc -L/gpfs/apps/hpc/GPU/cuda_7.5.18/lib64/ -I/gpfs/apps/hpc/GPU/cuda_7.5.18/include/ -lcuda -lcudart
+	gfortran -o glm.logit glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o -lgcc -L/gpfs/apps/hpc.rhel7/GPU/Cuda/9.0/lib64/ -I/gpfs/apps/hpc.rhel7/GPU/Cuda/9.0/include/ -lcuda -lcudart
 	# nvcc -lineinfo -o glm.logit glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o -L/usr/lib64
 
 glm.logit.o: glm.logit.cu lmfit.cu fit.cpp
