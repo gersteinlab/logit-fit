@@ -1172,9 +1172,9 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		for (unsigned int j = 0; j < nvars; j++) {
 			// vector<double> temp;
 			for (unsigned int k = 0; k < nobs; k++) {
-				// if (good[k] == true) { MIGHT NEED TO CHANGE THIS
+				if (good[k] == true) {
 					prefit_x[j][k] = x[j][k] * w[k];
-				// }
+				}
 			}
 			// prefit_x.push_back(temp);
 		}
