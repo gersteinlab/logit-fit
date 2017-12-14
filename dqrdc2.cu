@@ -113,12 +113,12 @@
     doublereal t, tt;
     integer lp1, lup;
     doublereal ttt;
-    extern doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
+    extern __device__ doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *), dnrm2_(integer *, doublereal *, integer *);
-    extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
+    extern __device__ /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *), daxpy_(integer *, doublereal *, doublereal *, integer 
 	    *, doublereal *, integer *);
-    static doublereal nrmxl;
+    doublereal nrmxl;
 
 
 /*     internal variables */
