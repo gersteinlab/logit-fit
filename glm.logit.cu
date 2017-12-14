@@ -1014,7 +1014,7 @@ pair <double,double> theta_ml (vector<double> &y, vector<double> &mu, double n, 
  * This is really a pared down glm_fit that only implements the portion needed
  * for the logistic regression fit
  */
-__device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm_pivot, bool* good, double* mu, double* eta, double* devold_vec, double* coef, double* coefold, double* w, double* varmu, double* mu_eta_val, double* z, double* prefit_y, double** prefit_x, double* lm_coefficients, double* start, double* residuals, double** Rmat, double* wt, double* wtdmu_vec, double* weights, fit* outfit) {
+__device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm_pivot, bool* good, double* mu, double* eta, double* devold_vec, double* coef, double* coefold, double* w, double* varmu, double* mu_eta_val, double* z, double* prefit_y, double** prefit_x, double* lm_coefficients, double* start, double* residuals, double** Rmat, double* wt, double* wtdmu_vec, double* weights) {
 
 	// DEBUG
 	// printf("Breakpoint 1\n");
@@ -1489,21 +1489,183 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	// DEBUG
 	// printf("Breakpoint 4\n");
   
-  fit this_fit(coef, residuals, mu, effects, Rmat, rank, qr, qraux, pivot, lm.getTol(),
-  						 eta, dev, aic_model, nulldev, iter, wt, weights, resdf, nulldf, y, 
-  						 conv, boundary);
-  // delete &lm;
-  *outfit = this_fit;
+//   fit this_fit(coef, residuals, mu, effects, Rmat, rank, qr, qraux, pivot, lm.getTol(),
+//   						 eta, dev, aic_model, nulldev, iter, wt, weights, resdf, nulldf, y, 
+//   						 conv, boundary);
+//   // delete &lm;
+//   *outfit = this_fit;
+	
+	// Output the values of "outfit"
+	// double* coefficients = *outfit.getCoefficients();
+	printf("<-- Coefficients -->\n");
+	for (unsigned int i = 0; i < nvars; i++) {
+		printf("%f", coef[i]);
+		if (i != nvars-1) {
+			printf("\t");
+		} else {
+			printf("\n\n");
+		}
+	}
+	
+	// double* residuals = outfit.getResiduals();
+	printf("<-- Residuals -->\n");
+	for (unsigned int i = 0; i < nobs; i++) {
+		printf("%f", residuals[i]);
+		if (i != nobs-1) {
+			printf("\t");
+		} else {
+			printf("\n\n");
+		}
+	}
+	
+	// double* fitted_values = outfit.getFittedValues();
+	printf("<-- Fitted Values -->\n");
+	for (unsigned int i = 0; i < nobs; i++) {
+		printf("%f", mu[i]);
+		if (i != nobs-1) {
+			printf("\t");
+		} else {
+			printf("\n\n");
+		}
+	}
+	
+	// double* effects = outfit.getEffects();
+	printf("<-- Effects -->\n");
+	for (unsigned int i = 0; i < nobs; i++) {
+		printf("%f", effects[i]);
+		if (i != nobs-1) {
+			printf("\t");
+		} else {
+			printf("\n\n");
+		}
+	}
+	
+	// double** R = outfit.getR();
+	printf("<-- R -->\n");
+	for (unsigned int i = 0; i < nvars; i++) {
+		for (unsigned int j = 0; j < nvars; j++) {
+			printf("%f", Rmat[i][j]);
+			if (j != nvars-1) {
+				printf("\t");
+			} else {
+				printf("\n");
+			}
+		}
+	}
+	
+	printf("\n");
+	
+	printf("<-- Rank -->\n");
+	printf("%d\n\n", outfit.getRank());
+	
+	double** qr = outfit.getQr();
+	printf("<-- QR matrix -->\n");
+	for (int i = 0; i < nvars; i++) {
+		for (int j = 0; j < nobs; i++) {
+			printf("%f", qr[i][j]);
+			if (j != nobs-1) {
+				printf("\t");
+			} else {
+				printf("\n");
+			}
+		}
+	}
+	
+	printf("\n");
+	
+	// vector<double> qraux = outfit.getQraux();
+	printf("<-- Qraux -->\n");
+	for (int i = 0; i < nvars; i++) {
+		printf("%f", qraux[i]);
+		if (i != nvars-1) {
+			printf("\t");
+		} else {
+			printf("\n\n");
+		}
+	}
+	
+	// vector<int> pivot = outfit.getPivot();
+	printf("<-- Pivot vector -->\n");
+	for (int i = 0; i < nvars; i++) {
+		printf("%d", pivot[i]);
+		if (i != nvars-1) {
+			printf("\t");
+		} else {
+			printf("\n\n");
+		}
+	}
+	
+	printf("<-- Tol -->\n");
+	printf("%f\n\n", lm.getTol());
+	
+	// double* linear_predictors = outfit.getLinearPredictors();
+	printf("<-- Linear Predictors -->\n");
+	for (unsigned int i = 0; i < nobs; i++) {
+		printf("%f", eta[i]);
+		if (i != nobs-1) {
+			printf("\t");
+		} else {
+			printf("\n\n");
+		}
+	}
+	
+	printf("<-- Deviance -->\n");
+	printf("%f\n\n", dev);
+	
+	printf("<-- AIC -->\n");
+	printf("%f\n\n", aic_model);
+	
+	printf("<-- Null deviance -->\n");
+	printf("%f\n\n", nulldev);
+	
+	printf("<-- Number of iterations -->\n");
+	printf("%d\n\n", iter);
+	
+	// double* weights = outfit.getWeights();
+	printf("<-- Weights -->\n");
+	for (unsigned int i = 0; i < nobs; i++) {
+		printf("%f", wt[i]);
+		if (i != nobs-1) {
+			printf("\t");
+		} else {
+			printf("\n\n");
+		}
+	}
+	
+	// double* prior_weights = outfit.getPriorWeights();
+	printf("<-- Prior Weights -->\n");
+	for (unsigned int i = 0; i < nobs; i++) {
+		printf("%f", weights[i]);
+		if (i != nobs-1) {
+			printf("\t");
+		} else {
+			printf("\n\n");
+		}
+	}
+	
+	printf("<-- Degrees of freedom residual -->\n");
+	printf("%d\n\n", resdf);
+	
+	printf("<-- Degrees of freedom null -->n");
+	printf("%d\n\n", nulldf);
+	
+	printf("<-- Converged -->\n");
+	char* bool_out = (conv) ? "true" : "false";
+	printf("%s\n\n", bool_out);
+	
+	printf("<-- Boundary -->\n");
+	bool_out = (boundary) ? "true" : "false";
+	printf("%s\n\n", bool_out);
 }
 
-__global__ void apportionWork(double* y_gpu, double** x_gpu, int* y_size, int* x_size, int* lm_pivot_gpu, bool* good_gpu, double* mu_gpu, double* eta_gpu, double* devold_vec_gpu, double* coef_gpu, double* coefold_gpu, double* w_gpu, double* varmu_gpu, double* mu_eta_gpu, double* z_gpu, double* prefit_y_gpu, double** prefit_x_gpu, double* lm_coefficients_gpu, double* start_gpu, double* residuals_gpu, double** Rmat_gpu, double* wt_gpu, double* wtdmu_vec_gpu, double* weights_gpu, fit* outfit) {
+__global__ void apportionWork(double* y_gpu, double** x_gpu, int* y_size, int* x_size, int* lm_pivot_gpu, bool* good_gpu, double* mu_gpu, double* eta_gpu, double* devold_vec_gpu, double* coef_gpu, double* coefold_gpu, double* w_gpu, double* varmu_gpu, double* mu_eta_gpu, double* z_gpu, double* prefit_y_gpu, double** prefit_x_gpu, double* lm_coefficients_gpu, double* start_gpu, double* residuals_gpu, double** Rmat_gpu, double* wt_gpu, double* wtdmu_vec_gpu, double* weights_gpu) {
 	
 	// Which thread am I?
 	int tid = threadIdx.x + blockIdx.x * blockDim.x;
 	
 	// For now, we're just going to have thread 0 run a logistic regression
 	if (tid == 0) {
-		glm_fit(y_gpu, x_gpu, y_size, x_size, lm_pivot_gpu, good_gpu, mu_gpu, eta_gpu, devold_vec_gpu, coef_gpu, coefold_gpu, w_gpu, varmu_gpu, mu_eta_gpu, z_gpu, prefit_y_gpu, prefit_x_gpu, lm_coefficients_gpu, start_gpu, residuals_gpu, Rmat_gpu, wt_gpu, wtdmu_vec_gpu, weights_gpu, outfit);
+		glm_fit(y_gpu, x_gpu, y_size, x_size, lm_pivot_gpu, good_gpu, mu_gpu, eta_gpu, devold_vec_gpu, coef_gpu, coefold_gpu, w_gpu, varmu_gpu, mu_eta_gpu, z_gpu, prefit_y_gpu, prefit_x_gpu, lm_coefficients_gpu, start_gpu, residuals_gpu, Rmat_gpu, wt_gpu, wtdmu_vec_gpu, weights_gpu);
 	}
 }
 
@@ -1745,171 +1907,173 @@ int main (int argc, char* argv[]) {
 	
 	// Do the actual glm_logit fitting
 	// Launch CUDA kernels
-	apportionWork<<<NUM_BLOCKS, THREADS_PER_BLOCK>>>(y_gpu, x_gpu, y_size, x_size, lm_pivot_gpu, good_gpu, mu_gpu, eta_gpu, devold_vec_gpu, coef_gpu, coefold_gpu, w_gpu, varmu_gpu, mu_eta_gpu, z_gpu, prefit_y_gpu, prefit_x_gpu, lm_coefficients_gpu, start_gpu, residuals_gpu, Rmat_gpu, wt_gpu, wtdmu_vec_gpu, weights_gpu, outfit);
+	apportionWork<<<NUM_BLOCKS, THREADS_PER_BLOCK>>>(y_gpu, x_gpu, y_size, x_size, lm_pivot_gpu, good_gpu, mu_gpu, eta_gpu, devold_vec_gpu, coef_gpu, coefold_gpu, w_gpu, varmu_gpu, mu_eta_gpu, z_gpu, prefit_y_gpu, prefit_x_gpu, lm_coefficients_gpu, start_gpu, residuals_gpu, Rmat_gpu, wt_gpu, wtdmu_vec_gpu, weights_gpu);
+	GPUerrchk(cudaPeekAtLastError());
+	cudaDeviceSynchronize();
 	GPUerrchk(cudaPeekAtLastError());
 	// fit outfit = glm_fit(y, x);
 	
 	// Output the values of "outfit"
-	double* coefficients = *outfit.getCoefficients();
-	printf("<-- Coefficients -->\n");
-	for (unsigned int i = 0; i < x.size(); i++) {
-		printf("%f", coefficients[i]);
-		if (i != x.size()-1) {
-			printf("\t");
-		} else {
-			printf("\n\n");
-		}
-	}
-	
-	double* residuals = outfit.getResiduals();
-	printf("<-- Residuals -->\n");
-	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%f", residuals[i]);
-		if (i != y.size()-1) {
-			printf("\t");
-		} else {
-			printf("\n\n");
-		}
-	}
-	
-	double* fitted_values = outfit.getFittedValues();
-	printf("<-- Fitted Values -->\n");
-	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%f", fitted_values[i]);
-		if (i != y.size()-1) {
-			printf("\t");
-		} else {
-			printf("\n\n");
-		}
-	}
-	
-	double* effects = outfit.getEffects();
-	printf("<-- Effects -->\n");
-	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%f", effects[i]);
-		if (i != y.size()-1) {
-			printf("\t");
-		} else {
-			printf("\n\n");
-		}
-	}
-	
-	double** R = outfit.getR();
-	printf("<-- R -->\n");
-	for (unsigned int i = 0; i < x.size(); i++) {
-		for (unsigned int j = 0; j < x.size(); j++) {
-			printf("%f", R[i][j]);
-			if (j != x.size()-1) {
-				printf("\t");
-			} else {
-				printf("\n");
-			}
-		}
-	}
-	
-	printf("\n");
-	
-	printf("<-- Rank -->\n");
-	printf("%d\n\n", outfit.getRank());
-	
-	double** qr = outfit.getQr();
-	printf("<-- QR matrix -->\n");
-	for (int i = 0; i < x.size(); i++) {
-		for (int j = 0; j < y.size(); i++) {
-			printf("%f", qr[i][j]);
-			if (j != y.size()-1) {
-				printf("\t");
-			} else {
-				printf("\n");
-			}
-		}
-	}
-	
-	printf("\n");
-	
-	vector<double> qraux = outfit.getQraux();
-	printf("<-- Qraux -->\n");
-	for (int i = 0; i < x.size(); i++) {
-		printf("%f", qraux[i]);
-		if (i != x.size()-1) {
-			printf("\t");
-		} else {
-			printf("\n\n");
-		}
-	}
-	
-	vector<int> pivot = outfit.getPivot();
-	printf("<-- Pivot vector -->\n");
-	for (int i = 0; i < x.size(); i++) {
-		printf("%d", pivot[i]);
-		if (i != x.size()-1) {
-			printf("\t");
-		} else {
-			printf("\n\n");
-		}
-	}
-	
-	printf("<-- Tol -->\n");
-	printf("%f\n\n", outfit.getTol());
-	
-	double* linear_predictors = outfit.getLinearPredictors();
-	printf("<-- Linear Predictors -->\n");
-	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%f", linear_predictors[i]);
-		if (i != y.size()-1) {
-			printf("\t");
-		} else {
-			printf("\n\n");
-		}
-	}
-	
-	printf("<-- Deviance -->\n");
-	printf("%f\n\n", outfit.getDeviance());
-	
-	printf("<-- AIC -->\n");
-	printf("%f\n\n", outfit.getAIC());
-	
-	printf("<-- Null deviance -->\n");
-	printf("%f\n\n", outfit.getNullDeviance());
-	
-	printf("<-- Number of iterations -->\n");
-	printf("%d\n\n", outfit.getIter());
-	
-	double* weights = outfit.getWeights();
-	printf("<-- Weights -->\n");
-	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%f", weights[i]);
-		if (i != y.size()-1) {
-			printf("\t");
-		} else {
-			printf("\n\n");
-		}
-	}
-	
-	double* prior_weights = outfit.getPriorWeights();
-	printf("<-- Prior Weights -->\n");
-	for (unsigned int i = 0; i < y.size(); i++) {
-		printf("%f", prior_weights[i]);
-		if (i != y.size()-1) {
-			printf("\t");
-		} else {
-			printf("\n\n");
-		}
-	}
-	
-	printf("<-- Degrees of freedom residual -->\n");
-	printf("%d\n\n", outfit.getDFResidual());
-	
-	printf("<-- Degrees of freedom null -->n");
-	printf("%d\n\n", outfit.getDFNull());
-	
-	printf("<-- Converged -->\n");
-	string bool_out = (outfit.getConverged()) ? "true" : "false";
-	printf("%s\n\n", bool_out.c_str());
-	
-	printf("<-- Boundary -->\n");
-	bool_out = (outfit.getBoundary()) ? "true" : "false";
-	printf("%s\n\n", bool_out.c_str());
+// 	double* coefficients = *outfit.getCoefficients();
+// 	printf("<-- Coefficients -->\n");
+// 	for (unsigned int i = 0; i < x.size(); i++) {
+// 		printf("%f", coefficients[i]);
+// 		if (i != x.size()-1) {
+// 			printf("\t");
+// 		} else {
+// 			printf("\n\n");
+// 		}
+// 	}
+// 	
+// 	double* residuals = outfit.getResiduals();
+// 	printf("<-- Residuals -->\n");
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		printf("%f", residuals[i]);
+// 		if (i != y.size()-1) {
+// 			printf("\t");
+// 		} else {
+// 			printf("\n\n");
+// 		}
+// 	}
+// 	
+// 	double* fitted_values = outfit.getFittedValues();
+// 	printf("<-- Fitted Values -->\n");
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		printf("%f", fitted_values[i]);
+// 		if (i != y.size()-1) {
+// 			printf("\t");
+// 		} else {
+// 			printf("\n\n");
+// 		}
+// 	}
+// 	
+// 	double* effects = outfit.getEffects();
+// 	printf("<-- Effects -->\n");
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		printf("%f", effects[i]);
+// 		if (i != y.size()-1) {
+// 			printf("\t");
+// 		} else {
+// 			printf("\n\n");
+// 		}
+// 	}
+// 	
+// 	double** R = outfit.getR();
+// 	printf("<-- R -->\n");
+// 	for (unsigned int i = 0; i < x.size(); i++) {
+// 		for (unsigned int j = 0; j < x.size(); j++) {
+// 			printf("%f", R[i][j]);
+// 			if (j != x.size()-1) {
+// 				printf("\t");
+// 			} else {
+// 				printf("\n");
+// 			}
+// 		}
+// 	}
+// 	
+// 	printf("\n");
+// 	
+// 	printf("<-- Rank -->\n");
+// 	printf("%d\n\n", outfit.getRank());
+// 	
+// 	double** qr = outfit.getQr();
+// 	printf("<-- QR matrix -->\n");
+// 	for (int i = 0; i < x.size(); i++) {
+// 		for (int j = 0; j < y.size(); i++) {
+// 			printf("%f", qr[i][j]);
+// 			if (j != y.size()-1) {
+// 				printf("\t");
+// 			} else {
+// 				printf("\n");
+// 			}
+// 		}
+// 	}
+// 	
+// 	printf("\n");
+// 	
+// 	vector<double> qraux = outfit.getQraux();
+// 	printf("<-- Qraux -->\n");
+// 	for (int i = 0; i < x.size(); i++) {
+// 		printf("%f", qraux[i]);
+// 		if (i != x.size()-1) {
+// 			printf("\t");
+// 		} else {
+// 			printf("\n\n");
+// 		}
+// 	}
+// 	
+// 	vector<int> pivot = outfit.getPivot();
+// 	printf("<-- Pivot vector -->\n");
+// 	for (int i = 0; i < x.size(); i++) {
+// 		printf("%d", pivot[i]);
+// 		if (i != x.size()-1) {
+// 			printf("\t");
+// 		} else {
+// 			printf("\n\n");
+// 		}
+// 	}
+// 	
+// 	printf("<-- Tol -->\n");
+// 	printf("%f\n\n", outfit.getTol());
+// 	
+// 	double* linear_predictors = outfit.getLinearPredictors();
+// 	printf("<-- Linear Predictors -->\n");
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		printf("%f", linear_predictors[i]);
+// 		if (i != y.size()-1) {
+// 			printf("\t");
+// 		} else {
+// 			printf("\n\n");
+// 		}
+// 	}
+// 	
+// 	printf("<-- Deviance -->\n");
+// 	printf("%f\n\n", outfit.getDeviance());
+// 	
+// 	printf("<-- AIC -->\n");
+// 	printf("%f\n\n", outfit.getAIC());
+// 	
+// 	printf("<-- Null deviance -->\n");
+// 	printf("%f\n\n", outfit.getNullDeviance());
+// 	
+// 	printf("<-- Number of iterations -->\n");
+// 	printf("%d\n\n", outfit.getIter());
+// 	
+// 	double* weights = outfit.getWeights();
+// 	printf("<-- Weights -->\n");
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		printf("%f", weights[i]);
+// 		if (i != y.size()-1) {
+// 			printf("\t");
+// 		} else {
+// 			printf("\n\n");
+// 		}
+// 	}
+// 	
+// 	double* prior_weights = outfit.getPriorWeights();
+// 	printf("<-- Prior Weights -->\n");
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		printf("%f", prior_weights[i]);
+// 		if (i != y.size()-1) {
+// 			printf("\t");
+// 		} else {
+// 			printf("\n\n");
+// 		}
+// 	}
+// 	
+// 	printf("<-- Degrees of freedom residual -->\n");
+// 	printf("%d\n\n", outfit.getDFResidual());
+// 	
+// 	printf("<-- Degrees of freedom null -->n");
+// 	printf("%d\n\n", outfit.getDFNull());
+// 	
+// 	printf("<-- Converged -->\n");
+// 	string bool_out = (outfit.getConverged()) ? "true" : "false";
+// 	printf("%s\n\n", bool_out.c_str());
+// 	
+// 	printf("<-- Boundary -->\n");
+// 	bool_out = (outfit.getBoundary()) ? "true" : "false";
+// 	printf("%s\n\n", bool_out.c_str());
 	
 // 	printf("<-- Theta -->\n");
 // 	printf("%f\n\n", outfit.getTheta());
