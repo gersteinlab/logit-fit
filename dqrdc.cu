@@ -11,6 +11,10 @@
 */
 
 #include "f2c.h"
+#include "ddot.cuh"
+#include "dnrm2.cuh"
+#include "dswap.cuh"
+#include "daxpy.cuh"
 
 /* Table of constant values */
 
