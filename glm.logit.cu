@@ -536,7 +536,7 @@ __device__ double bd0(double x, double np) {
 }
 
 /* A log-likelihood helper function */
-double loglik (int n, double th, 
+__device__ double loglik (int n, double th, 
 							 const vector<double> &mu, const vector<double> &y) {
 	
 	double sum = 0;
