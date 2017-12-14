@@ -941,7 +941,16 @@ __device__ lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size,
 // 		qraux_vec.push_back(qraux[i]);
 // 	}
 	
-	lmfit lm1 (qr_new, coefficients, residuals, effects, rank, pivot, qraux, tol, pivoted);
+	lmfit lm1;
+	lm1.qr = qr_new;
+	lm1.coefficients = coefficients;
+	lm1.residuals = residuals;
+	lm1.effects = effects;
+	lm1.rank = rank;
+	lm1.pivot = pivot;
+	lm1.qraux = qraux;
+	lm1.tol = tol;
+	lm1.pivoted = pivoted;
 	
 	// DEBUG
 	// printf("Breakpoint Eta\n");
@@ -1179,7 +1188,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		// printf("Breakpoint Tau 2\n");
 		// exit(0);
 		
-		lm_coefficients = lm.getCoefficients();
+		lm_coefficients = lm.coefficients;
 		for (int j = 0; j < nvars; j++) {
 			if (isinf(lm_coefficients[j])) {
 				conv = false;
@@ -1189,13 +1198,13 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		}
 		
 		// Stop if not enough parameters
-		if (nobs < lm.getRank()) {
-			printf("Error: X matrix has rank %d, but only %d observation(s).\n", lm.getRank(), nobs);
+		if (nobs < lm.rank) {
+			printf("Error: X matrix has rank %d, but only %d observation(s).\n", lm.rank, nobs);
 			asm("trap;");
 		}
 		
 		// calculate updated values of eta and mu with the new coef
-		lm_pivot = lm.getPivot();
+		lm_pivot = lm.pivot;
 		// vector<double> start; // (nvars,0.0);
 		for (int j = 0; j < nvars; j++) {
 			// This code not necessary: if (lm_pivot[j]) {
@@ -1356,9 +1365,9 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	
 	// If X matrix was not full rank then columns were pivoted,
   // hence we need to re-label the names ...
-  lm_pivot = lm.getPivot();
+  lm_pivot = lm.pivot;
   if (lm.getRank() < nvars) {
-  	for (unsigned int i = lm.getRank(); i < (unsigned int)nvars; i++) {
+  	for (unsigned int i = lm.rank; i < (unsigned int)nvars; i++) {
   		coef[lm_pivot[i]-1] = 0;
   	}
   }
@@ -1373,7 +1382,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
   	double temp = (y[i] - mu[i])/mu_eta_val[i];
   	residuals[i] = temp;
   }
-  double** lm_qr = lm.getQr();
+  double** lm_qr = lm.qr;
   
   // DEBUG
 	// printf("Breakpoint 3c\n");
@@ -1475,16 +1484,16 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
   // DEBUG
 	// printf("Breakpoint 3h\n");
   
-  double* effects = lm.getEffects();
+  double* effects = lm.effects;
   
   // vector<double> weights;
   for (int i = 0; i < nobs; i++) {
   	weights[i] = 1.0;
   }
   
-  double** qr = lm.getQr();
-	double* qraux = lm.getQraux();
-	int* pivot = lm.getPivot();
+  double** qr = lm.qr;
+	double* qraux = lm.qraux;
+	int* pivot = lm.pivot;
 	
 	// DEBUG
 	// printf("Breakpoint 4\n");
