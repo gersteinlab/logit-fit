@@ -1700,8 +1700,8 @@ int main (int argc, char* argv[]) {
  		printf("Usage: glm.logit [response file] [predictor file]\n");
  		return 1;
  	}
-	const char y_file[STRSIZE] = argv[1];
-	const char x_file[STRSIZE] = argv[2];
+	const char* y_file = argv[1];
+	const char* x_file = argv[2];
  		// init_theta = atof(argv[3]);
  	
  	// DEBUG
@@ -1799,7 +1799,9 @@ int main (int argc, char* argv[]) {
 			if (linebuf[i] == '\n') {
 				break;
 			} else {
-				linebuf += i+1;
+				char temp2[STRSIZE];
+				strcpy(temp2, linebuf+i+1);
+				linebuf = temp2;
 			}
 		}
 		row++;
