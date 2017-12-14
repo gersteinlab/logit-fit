@@ -78,7 +78,7 @@ __device__ double R_D_exp (double x, bool log_p) {
 }
 
 // Returns the value ln[gamma(xx)] for xx > 0.
-double gammln(double xx) {
+__device__ double gammln(double xx) {
 	double x,y,tmp,ser;
 	static double cof[6]={76.18009172947146,-86.50532032941677,
 												24.01409824083091,-1.231739572450155,
@@ -512,8 +512,8 @@ __device__ double bd0(double x, double np) {
     int j;
 
     if (isnan(x) || isnan(np) || np == 0.0) {
-    	perror("Error: bd0 given an argument that is not a number.\n");
-			exit(1);
+    	printf("Error: bd0 given an argument that is not a number.\n");
+			asm("trap;");
 		}
 
     if (fabs(x-np) < 0.1*(x+np)) {
