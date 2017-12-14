@@ -1,10 +1,10 @@
 all: glm.logit
 
 glm.logit: glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o
-	gfortran -o glm.logit glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o -lgcc -L/ysm-gpfs/apps/software/CUDA/9.0.176/lib64/ -lcuda -lcudart
+	gfortran -o glm.logit glm.logit.o daxpy.o dcopy.o ddot.o dnrm2.o dqrdc.o dqrdc2.o dqrls.o dqrsl.o dscal.o dswap.o -lgcc -L/ysm-gpfs/apps/software/CUDA/9.0.176/lib64/ -I/ysm-gpfs/apps/software/CUDA/9.0.176/include/ -lcuda -lcudart
 
-glm.logit.o: glm.logit.cu lmfit.cu
-	nvcc -lineinfo -dc glm.logit.cu lmfit.cu
+glm.logit.o: glm.logit.cu lmfit.cu fit.cpp
+	nvcc -lineinfo -dc glm.logit.cu lmfit.cu fit.cpp
 	
 daxpy.o: daxpy.f
 	gfortran -c daxpy.f
