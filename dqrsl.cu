@@ -11,6 +11,9 @@
 */
 
 #include "f2c.h"
+#include "ddot.cuh"
+#include "dcopy.cuh"
+#include "daxpy.cuh"
 
 /* Table of constant values */
 
@@ -171,13 +174,13 @@ __device__ static integer c__100 = 1;
     logical cr;
     integer ju, kp1;
     logical cxb, cqy;
-    extern __device__ doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
-	    integer *);
+//     extern __device__ doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
+// 	    integer *);
     doublereal temp;
     logical cqty;
-    extern __device__ /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *), daxpy_(integer *, doublereal *, 
-	    doublereal *, integer *, doublereal *, integer *);
+//     extern __device__ /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
+// 	    doublereal *, integer *), daxpy_(integer *, doublereal *, 
+// 	    doublereal *, integer *, doublereal *, integer *);
 
 
 /*     internal variables */
