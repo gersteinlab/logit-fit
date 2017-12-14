@@ -1556,9 +1556,9 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	printf("\n");
 	
 	printf("<-- Rank -->\n");
-	printf("%d\n\n", outfit.getRank());
+	printf("%d\n\n", rank);
 	
-	double** qr = outfit.getQr();
+	// double** qr = outfit.getQr();
 	printf("<-- QR matrix -->\n");
 	for (int i = 0; i < nvars; i++) {
 		for (int j = 0; j < nobs; i++) {
@@ -1650,7 +1650,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	printf("%d\n\n", nulldf);
 	
 	printf("<-- Converged -->\n");
-	char* bool_out = (conv) ? "true" : "false";
+	const char* bool_out = (conv) ? "true" : "false";
 	printf("%s\n\n", bool_out);
 	
 	printf("<-- Boundary -->\n");
