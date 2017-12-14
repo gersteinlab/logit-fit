@@ -1681,12 +1681,12 @@ int main (int argc, char* argv[]) {
 
 	// The response vector (y) file
 	// Each value is listed one per row
-	const char y_file[STRSIZE];
+	// const char y_file[STRSIZE];
 	
  	// The predictor matrix (x) file
  	// Rows are observations, columns are predictor variables
  	// Assumes tab-delimited values
- 	const char x_file[STRSIZE];
+ 	// const char x_file[STRSIZE];
  	
  	// The initial theta to use in fitting
  	// double init_theta;
@@ -1699,11 +1699,10 @@ int main (int argc, char* argv[]) {
  		printf("Incorrect number of arguments: found %d but expected 2. Exiting.\n", argc-1);
  		printf("Usage: glm.logit [response file] [predictor file]\n");
  		return 1;
- 	} else {
- 		strcpy(y_file, argv[1]);
- 		strcpy(x_file, argv[2]);
- 		// init_theta = atof(argv[3]);
  	}
+	const char y_file[STRSIZE] = argv[1];
+	const char x_file[STRSIZE] = argv[2];
+ 		// init_theta = atof(argv[3]);
  	
  	// DEBUG
  	// printf("Breakpoint Sigma\n");
@@ -1800,7 +1799,7 @@ int main (int argc, char* argv[]) {
 			if (linebuf[i] == '\n') {
 				break;
 			} else {
-				linebuf = &linebuf[i+1];
+				linebuf += i+1;
 			}
 		}
 		row++;
