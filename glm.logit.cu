@@ -1681,12 +1681,12 @@ int main (int argc, char* argv[]) {
 
 	// The response vector (y) file
 	// Each value is listed one per row
-	char* y_file[STRSIZE];
+	const char* y_file[STRSIZE];
 	
  	// The predictor matrix (x) file
  	// Rows are observations, columns are predictor variables
  	// Assumes tab-delimited values
- 	char* x_file[STRSIZE];
+ 	const char* x_file[STRSIZE];
  	
  	// The initial theta to use in fitting
  	// double init_theta;
@@ -1700,8 +1700,8 @@ int main (int argc, char* argv[]) {
  		printf("Usage: glm.logit [response file] [predictor file]\n");
  		return 1;
  	} else {
- 		y_file = argv[1];
- 		x_file = argv[2];
+ 		strcpy(y_file, argv[1]);
+ 		strcpy(x_file, argv[2]);
  		// init_theta = atof(argv[3]);
  	}
  	
@@ -1785,7 +1785,7 @@ int main (int argc, char* argv[]) {
 		col = 0;
 		while (strcmp(linebuf, "") != 0) {
 			int i;
-			for (i = 0; i < strlen(linebuf), i++) {
+			for (i = 0; i < strlen(linebuf); i++) {
 				if (linebuf[i] == '\t' || linebuf[i] == '\n') {
 					break;
 				}
@@ -1844,99 +1844,101 @@ int main (int argc, char* argv[]) {
 	}
 	
 	// x_tr.clear();
+	int xsize = col;
+	int xisize = row;
 	
 	// DEBUG
 	// printf("Breakpoint Gamma\n");
 	// exit(0);
 	
 	// CUDA stuff
-	double *y_cpu = (double *)malloc(y.size()*sizeof(double));
+	double *y_cpu = (double *)malloc(ysize*sizeof(double));
 	for (unsigned int i = 0; i < y.size(); i++) {
 		y_cpu[i] = y[i];
 	}
 	
 	double *y_gpu;
-	cudaMalloc((void**)&y_gpu, y.size()*sizeof(double));
-	cudaMemcpy(y_gpu, y_cpu, y.size()*sizeof(double), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&y_gpu, ysize*sizeof(double));
+	cudaMemcpy(y_gpu, y_cpu, ysize*sizeof(double), cudaMemcpyHostToDevice);
 	
 	double **x_gpu, **x_gpu_b;
-	cudaMalloc((void**)&x_gpu, x.size()*sizeof(double *));
-	x_gpu_b = (double **)malloc(x.size()*sizeof(double *));
-	for (int i = 0; i < (int)x.size(); i++) {
-		cudaMalloc((void**)&x_gpu_b[i], x[i].size()*sizeof(double));
-		double *xi = (double *)malloc(x[i].size()*sizeof(double));
-		for (int j = 0; j < (int)x[i].size(); j++) {
+	cudaMalloc((void**)&x_gpu, xsize*sizeof(double *));
+	x_gpu_b = (double **)malloc(xsize*sizeof(double *));
+	for (int i = 0; i < (int)xsize; i++) {
+		cudaMalloc((void**)&x_gpu_b[i], xisize*sizeof(double));
+		double *xi = (double *)malloc(xisize*sizeof(double));
+		for (int j = 0; j < (int)xisize; j++) {
 			xi[j] = x[i][j];
 		}
-		cudaMemcpy(x_gpu_b[i], xi, x[i].size()*sizeof(double), cudaMemcpyHostToDevice);
+		cudaMemcpy(x_gpu_b[i], xi, xisize*sizeof(double), cudaMemcpyHostToDevice);
 	}
-	cudaMemcpy(x_gpu, x_gpu_b, x.size()*sizeof(double *), cudaMemcpyHostToDevice);
+	cudaMemcpy(x_gpu, x_gpu_b, xsize*sizeof(double *), cudaMemcpyHostToDevice);
 	
-	int y_size_cpu = (int)y.size();
+	int y_size_cpu = (int)ysize;
 	int *y_size;
 	cudaMalloc((void**)&y_size, sizeof(int));
 	cudaMemcpy(y_size, &y_size_cpu, sizeof(int), cudaMemcpyHostToDevice);
-	int x_size_cpu = (int)x.size();
+	int x_size_cpu = (int)xsize;
 	int *x_size;
 	cudaMalloc((void**)&x_size, sizeof(int));
 	cudaMemcpy(x_size, &x_size_cpu, sizeof(int), cudaMemcpyHostToDevice);
 	
 	int *lm_pivot_gpu;
-	cudaMalloc((void**)&lm_pivot_gpu, y.size()*sizeof(int));
+	cudaMalloc((void**)&lm_pivot_gpu, ysize*sizeof(int));
 	bool *good_gpu;
-	cudaMalloc((void**)&good_gpu, y.size()*sizeof(bool));
+	cudaMalloc((void**)&good_gpu, ysize*sizeof(bool));
 	double *mu_gpu;
-	cudaMalloc((void**)&mu_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&mu_gpu, ysize*sizeof(double));
 	double *eta_gpu;
-	cudaMalloc((void**)&eta_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&eta_gpu, ysize*sizeof(double));
 	double *devold_vec_gpu;
-	cudaMalloc((void**)&devold_vec_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&devold_vec_gpu, ysize*sizeof(double));
 	double *coef_gpu;
-	cudaMalloc((void**)&coef_gpu, x.size()*sizeof(double));
+	cudaMalloc((void**)&coef_gpu, xsize*sizeof(double));
 	double *coefold_gpu;
-	cudaMalloc((void**)&coefold_gpu, x.size()*sizeof(double));
+	cudaMalloc((void**)&coefold_gpu, xsize*sizeof(double));
 	double *w_gpu;
-	cudaMalloc((void**)&w_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&w_gpu, ysize*sizeof(double));
 	double *varmu_gpu;
-	cudaMalloc((void**)&varmu_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&varmu_gpu, ysize*sizeof(double));
 	double *mu_eta_gpu;
-	cudaMalloc((void**)&mu_eta_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&mu_eta_gpu, ysize*sizeof(double));
 	double *z_gpu;
-	cudaMalloc((void**)&z_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&z_gpu, ysize*sizeof(double));
 	
 	double *prefit_y_gpu;
-	cudaMalloc((void**)&prefit_y_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&prefit_y_gpu, ysize*sizeof(double));
 	
 	double **prefit_x_gpu, **prefit_x_gpu_b;
-	cudaMalloc((void**)&prefit_x_gpu, x[0].size()*sizeof(double *));
-	prefit_x_gpu_b = (double **)malloc(x[0].size()*sizeof(double *));
-	for (int i = 0; i < (int)x.size(); i++) {
-		cudaMalloc((void**)&prefit_x_gpu_b[i], x.size()*sizeof(double));
+	cudaMalloc((void**)&prefit_x_gpu, xisize*sizeof(double *));
+	prefit_x_gpu_b = (double **)malloc(xisize*sizeof(double *));
+	for (int i = 0; i < (int)xsize; i++) {
+		cudaMalloc((void**)&prefit_x_gpu_b[i], xsize*sizeof(double));
 		// cudaMemcpy(prefit_x_gpu_b[i], x[i], x[i].size()*sizeof(double), cudaMemcpyHostToDevice);
 	}
-	cudaMemcpy(prefit_x_gpu, prefit_x_gpu_b, x[0].size()*sizeof(double *), cudaMemcpyHostToDevice);
+	cudaMemcpy(prefit_x_gpu, prefit_x_gpu_b, xisize*sizeof(double *), cudaMemcpyHostToDevice);
 	
 	double* lm_coefficients_gpu;
-	cudaMalloc((void**)&lm_coefficients_gpu, x.size()*sizeof(double));
+	cudaMalloc((void**)&lm_coefficients_gpu, xsize*sizeof(double));
 	double* start_gpu;
-	cudaMalloc((void**)&start_gpu, x.size()*sizeof(double));
+	cudaMalloc((void**)&start_gpu, xsize*sizeof(double));
 	double* residuals_gpu;
-	cudaMalloc((void**)&residuals_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&residuals_gpu, ysize*sizeof(double));
 	
 	double **Rmat_gpu, **Rmat_gpu_b;
-	cudaMalloc((void**)&Rmat_gpu, x.size()*sizeof(double *));
-	Rmat_gpu_b = (double **)malloc(x.size()*sizeof(double *));
-	for (int i = 0; i < (int)x.size(); i++) {
-		cudaMalloc((void**)&Rmat_gpu_b[i], x.size()*sizeof(double));
+	cudaMalloc((void**)&Rmat_gpu, xsize*sizeof(double *));
+	Rmat_gpu_b = (double **)malloc(xsize*sizeof(double *));
+	for (int i = 0; i < (int)xsize; i++) {
+		cudaMalloc((void**)&Rmat_gpu_b[i], xsize*sizeof(double));
 	}
-	cudaMemcpy(Rmat_gpu, Rmat_gpu_b, x.size()*sizeof(double *), cudaMemcpyHostToDevice);
+	cudaMemcpy(Rmat_gpu, Rmat_gpu_b, xsize*sizeof(double *), cudaMemcpyHostToDevice);
 	
 	double* wt_gpu;
-	cudaMalloc((void**)&wt_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&wt_gpu, ysize*sizeof(double));
 	double* wtdmu_vec_gpu;
-	cudaMalloc((void**)&wtdmu_vec_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&wtdmu_vec_gpu, ysize*sizeof(double));
 	double* weights_gpu;
-	cudaMalloc((void**)&weights_gpu, y.size()*sizeof(double));
+	cudaMalloc((void**)&weights_gpu, ysize*sizeof(double));
 	fit* outfit;
 	cudaMalloc((void**)&outfit, sizeof(fit));
 	
