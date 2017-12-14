@@ -198,7 +198,7 @@ void dpsifn(double x, int n, int kode, int m, double *ans, int *nz, int *ierr)
 	if (x == round(x)) {
 	    /* non-positive integer : +Inf or NaN depends on n */
 	    for(j=0; j < m; j++) /* k = j + n : */
-		ans[j] = ((j+n) % 2) ? std::numeric_limits<double>::infinity() : nan("");
+		ans[j] = ((j+n) % 2) ? INFINITY : nan("");
 	    return;
 	}
 	/* This could cancel badly */
