@@ -960,62 +960,62 @@ __device__ lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size,
 /*
  * Theta_ml's score function
  */
-double theta_score (double n, double th, vector<double> &mu, vector<double> &y) {
-	double sum = 0.0;
-	for (unsigned int i = 0; i < y.size(); i++) {
-		sum += digamma(th + y[i]) - digamma(th) + log(th) + 1 - log(th + mu[i]) - 
-					 (y[i] + th)/(mu[i] + th);
-	}
-	return sum;
-}
+// double theta_score (double n, double th, vector<double> &mu, vector<double> &y) {
+// 	double sum = 0.0;
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		sum += digamma(th + y[i]) - digamma(th) + log(th) + 1 - log(th + mu[i]) - 
+// 					 (y[i] + th)/(mu[i] + th);
+// 	}
+// 	return sum;
+// }
 
 /*
  * Theta_ml's info function
  */
-double theta_info (double n, double th, vector<double> &mu, vector<double> &y) {
-	double sum = 0.0;
-	for (unsigned int i = 0; i < y.size(); i++) {
-		sum += -trigamma(th + y[i]) + trigamma(th) - 1/th + 2/(mu[i] + th) - 
-					 (y[i] + th)/pow((mu[i] + th),2.0);
-	}
-	return sum;
-}
+// double theta_info (double n, double th, vector<double> &mu, vector<double> &y) {
+// 	double sum = 0.0;
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		sum += -trigamma(th + y[i]) + trigamma(th) - 1/th + 2/(mu[i] + th) - 
+// 					 (y[i] + th)/pow((mu[i] + th),2.0);
+// 	}
+// 	return sum;
+// }
 
 /*
  * This is the theta ML estimator code
  * Assume equal weights (=1) for all predictors
  */
-pair <double,double> theta_ml (vector<double> &y, vector<double> &mu, double n, int limit) {
-	
-	// Control variables
-	double epsilon = 1e-8;
-	
-	double denom = 0.0;
-	for (unsigned int i = 0; i < y.size(); i++) {
-		denom += pow((y[i]/mu[i] - 1.0), 2.0);
-	}
-	double t0 = n/denom;
-	int it = 0;
-	double del = 1.0;
-	double i;
-	for (; (it < limit) && fabs(del) > epsilon; it++) {
-		t0 = fabs(t0);
-		i = theta_info(n, t0, mu, y);
-		del = theta_score(n, t0, mu, y)/i;
-		t0 += del;
-	}
-	if (t0 < 0.0) {
-		t0 = 0.0;
-		printf("Warning: theta estimate truncated at zero\n");
-	}
-	if (it == limit) {
-		printf("Warning: theta estimator iteration limit reached\n");
-	}
-	double se = sqrt(1/i);
-	pair <double,double> retval (t0,se);
-	return retval;
-	// return t0;
-}
+// pair <double,double> theta_ml (vector<double> &y, vector<double> &mu, double n, int limit) {
+// 	
+// 	// Control variables
+// 	double epsilon = 1e-8;
+// 	
+// 	double denom = 0.0;
+// 	for (unsigned int i = 0; i < y.size(); i++) {
+// 		denom += pow((y[i]/mu[i] - 1.0), 2.0);
+// 	}
+// 	double t0 = n/denom;
+// 	int it = 0;
+// 	double del = 1.0;
+// 	double i;
+// 	for (; (it < limit) && fabs(del) > epsilon; it++) {
+// 		t0 = fabs(t0);
+// 		i = theta_info(n, t0, mu, y);
+// 		del = theta_score(n, t0, mu, y)/i;
+// 		t0 += del;
+// 	}
+// 	if (t0 < 0.0) {
+// 		t0 = 0.0;
+// 		printf("Warning: theta estimate truncated at zero\n");
+// 	}
+// 	if (it == limit) {
+// 		printf("Warning: theta estimator iteration limit reached\n");
+// 	}
+// 	double se = sqrt(1/i);
+// 	pair <double,double> retval (t0,se);
+// 	return retval;
+// 	// return t0;
+// }
 	
 /* 
  * This is really a pared down glm_fit that only implements the portion needed
