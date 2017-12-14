@@ -16,6 +16,7 @@
 
 using namespace std;
 
+#include "f2c.h"
 #include "daxpy.cu"
 #include "dcopy.cu"
 #include "ddot.cu"
