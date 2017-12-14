@@ -571,7 +571,7 @@ __device__ void mu_eta (double* eta, double* mu_eta_val, int size) {
 }
 
 // Our own dbinom function
-double* dbinom (double* x, double* n, double* p, bool log_p, int size) {
+__device__ double* dbinom (double* x, double* n, double* p, bool log_p, int size) {
 	
 	// Error checking
 	for (unsigned int i = 0; i < size; i++) {
@@ -809,7 +809,7 @@ __device__ lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size,
 		for (int j = 0; j < n; j++) {
 			if (isinf(x[i][j])) {
 				printf("Error: NA/NaN/Inf in \'x\' matrix: (%d,%d)\n", i, j);
-				exit(1);
+				asm("trap;");
 			}
 		}
 	}
@@ -817,7 +817,7 @@ __device__ lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size,
 	for (unsigned int i = 0; i < p; i++) {
 		if (isinf(y[i])) {
 			printf("Error: NA/NaN/Inf in \'y\' vector: element %d\n", i);
-			exit(1);
+			asm("trap;");
 		}
 	}
 	
