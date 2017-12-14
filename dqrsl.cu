@@ -14,7 +14,7 @@
 
 /* Table of constant values */
 
-// static integer c__1 = 1;
+__device__ static integer c__100 = 1;
 
 
 /*     dqrsl applies the output of dqrdc to compute coordinate */
@@ -247,10 +247,10 @@ L40:
 /*        set up to compute qy or qty. */
 
     if (cqy) {
-	dcopy_(n, &y[1], &c__1, &qy[1], &c__1);
+	dcopy_(n, &y[1], &c__100, &qy[1], &c__100);
     }
     if (cqty) {
-	dcopy_(n, &y[1], &c__1, &qty[1], &c__1);
+	dcopy_(n, &y[1], &c__100, &qty[1], &c__100);
     }
     if (! cqy) {
 	goto L70;
@@ -267,10 +267,10 @@ L40:
 	temp = x[j + j * x_dim1];
 	x[j + j * x_dim1] = qraux[j];
 	i__2 = *n - j + 1;
-	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__1, &qy[j], &c__1) / x[j + j 
+	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__100, &qy[j], &c__100) / x[j + j 
 		* x_dim1];
 	i__2 = *n - j + 1;
-	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__1, &qy[j], &c__1);
+	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__100, &qy[j], &c__100);
 	x[j + j * x_dim1] = temp;
 L50:
 /* L60: */
@@ -291,10 +291,10 @@ L70:
 	temp = x[j + j * x_dim1];
 	x[j + j * x_dim1] = qraux[j];
 	i__2 = *n - j + 1;
-	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__1, &qty[j], &c__1) / x[j + 
+	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__100, &qty[j], &c__100) / x[j + 
 		j * x_dim1];
 	i__2 = *n - j + 1;
-	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__1, &qty[j], &c__1);
+	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__100, &qty[j], &c__100);
 	x[j + j * x_dim1] = temp;
 L80:
 /* L90: */
@@ -305,15 +305,15 @@ L100:
 /*        set up to compute b, rsd, or xb. */
 
     if (cb) {
-	dcopy_(k, &qty[1], &c__1, &b[1], &c__1);
+	dcopy_(k, &qty[1], &c__100, &b[1], &c__100);
     }
     kp1 = *k + 1;
     if (cxb) {
-	dcopy_(k, &qty[1], &c__1, &xb[1], &c__1);
+	dcopy_(k, &qty[1], &c__100, &xb[1], &c__100);
     }
     if (cr && *k < *n) {
 	i__1 = *n - *k;
-	dcopy_(&i__1, &qty[kp1], &c__1, &rsd[kp1], &c__1);
+	dcopy_(&i__1, &qty[kp1], &c__100, &rsd[kp1], &c__100);
     }
     if (! cxb || kp1 > *n) {
 	goto L120;
@@ -355,7 +355,7 @@ L150:
 	}
 	t = -b[j];
 	i__2 = j - 1;
-	daxpy_(&i__2, &t, &x[j * x_dim1 + 1], &c__1, &b[1], &c__1);
+	daxpy_(&i__2, &t, &x[j * x_dim1 + 1], &c__100, &b[1], &c__100);
 L160:
 /* L170: */
 	;
@@ -380,19 +380,19 @@ L190:
 	    goto L200;
 	}
 	i__2 = *n - j + 1;
-	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__1, &rsd[j], &c__1) / x[j + 
+	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__100, &rsd[j], &c__100) / x[j + 
 		j * x_dim1];
 	i__2 = *n - j + 1;
-	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__1, &rsd[j], &c__1);
+	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__100, &rsd[j], &c__100);
 L200:
 	if (! cxb) {
 	    goto L210;
 	}
 	i__2 = *n - j + 1;
-	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__1, &xb[j], &c__1) / x[j + j 
+	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__100, &xb[j], &c__100) / x[j + j 
 		* x_dim1];
 	i__2 = *n - j + 1;
-	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__1, &xb[j], &c__1);
+	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__100, &xb[j], &c__100);
 L210:
 	x[j + j * x_dim1] = temp;
 L220:
