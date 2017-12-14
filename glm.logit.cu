@@ -61,7 +61,7 @@ static const double INVEPS = 1/DOUBLE_EPS;
 __device__ double x_d_omx(double x) {
   if (x < 0 || x > 1) {
 		printf("Error: Value %g out of range (0, 1)", x);
-		exit(1);
+		asm("trap;")
 	}
   return x/(1 - x);
 }
@@ -554,7 +554,7 @@ double linkfun (double mu) {
 	return log(mu);
 }
 
-double linkinv (double eta) {
+__device__ double linkinv (double eta) {
 	double temp = (eta < MTHRESH) ? DOUBLE_EPS : ((eta > THRESH) ? INVEPS : exp(eta));
 	return x_d_opx(temp);
 	// return (max(exp(eta), DBL_MIN));
@@ -667,7 +667,7 @@ __device__ bool logit_validmu (double* mu, int size) {
 	return true;
 }
 
-double y_log_y (double y, double mu) {
+__device__ double y_log_y (double y, double mu) {
 	return (y != 0.) ? (y * log(y/mu)) : 0;
 }
 
@@ -686,7 +686,7 @@ __device__ void logit_dev_residuals (double* y, double* mu, double* dev, int siz
 	
 	if (lmu != n && lmu != 1) {
 		printf("Error: Argument mu must be a numeric vector of length 1 or length %d\n", n);
-		exit(1);
+		asm("trap;")
 	}
 	
 	for (int i = 0; i < n; i++) {
@@ -696,7 +696,7 @@ __device__ void logit_dev_residuals (double* y, double* mu, double* dev, int siz
 }
 
 // Calculate the AIC
-double logit_aic (double* y, double* mu, int size) {
+__device__ double logit_aic (double* y, double* mu, int size) {
 	// vector<double> m;
 // 	bool is_n = false;
 // 	for (unsigned int i = 0; i < n.size(); i++) {
@@ -779,7 +779,7 @@ double logit_aic (double* y, double* mu, int size) {
 // 	// Reduce x
 // 	dqrdc2(x,n,n,p,tol,k,qraux,jpvt,work);
 
-lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size, int x_size) {
+__device__ lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size, int x_size) {
 	
 	// double ans;
 	double *qr;
@@ -1039,7 +1039,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	for (unsigned int i = 0; i < nobs; i++) {
 		if (y[i] < 0) {
 			printf("Error: negative values not allowed for the negative binomial model. Exiting.\n");
-			exit(1);
+			asm("trap;")
 		}
 		// n.push_back(1.0);
 		mu[i] = ((y[i] + 0.5)/2);
@@ -1062,7 +1062,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		
 	if (!logit_validmu(mu, nobs)) {
 		printf("Invalid starting mu detected. Exiting.\n");
-		exit(1);
+		asm("trap;")
 	}
 	
 	// calculate initial deviance and coefficient
@@ -1101,17 +1101,17 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		for (unsigned int j = 0; j < nobs; j++) {
 			if (isnan(varmu[j])) {
 				printf("NaNs in the mu variance: cannot proceed. Exiting.\n");
-				exit(1);
+				asm("trap;")
 			} else if (varmu[j] == 0) {
 				printf("Zeroes in the mu variance: cannot proceed. Exiting.\n");
-				exit(1);
+				asm("trap;")
 			}
 		}
 		mu_eta(eta, mu_eta_val, nobs);
 		for (unsigned int j = 0; j < nobs; j++) {
 			if (isnan(mu_eta_val[j])) {
 				printf("NaNs in the d(mu)/d(eta)\n");
-				exit(1);
+				asm("trap;")
 			}
 		}
 		
@@ -1191,7 +1191,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		// Stop if not enough parameters
 		if (nobs < lm.getRank()) {
 			printf("Error: X matrix has rank %d, but only %d observation(s).\n", lm.getRank(), nobs);
-			exit(1);
+			asm("trap;")
 		}
 		
 		// calculate updated values of eta and mu with the new coef
@@ -1233,13 +1233,13 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 			if (coefold[0] == -INFINITY) {
 				printf("Error: divergence in function fitting. No valid set of ");
 				printf("coefficients has been found. Exiting.\n");
-				exit(1);
+				asm("trap;")
 			}
 			int ii = 1;
 			while (isinf(dev)) {
 				if (ii > maxit) {
 					printf("Error: Inner loop 1; cannot correct step size\n");
-					exit(1);
+					asm("trap;")
 				}
 				ii++;
 				// Element-wise addition
@@ -1278,13 +1278,13 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 			if (coefold[0] == -INFINITY) {
 				printf("Error: Fitted mu is outside the valid domain. No valid set of ");
 				printf("coefficients has been found. Exiting.\n");
-				exit(1);
+				asm("trap;")
 			}
 			int ii = 1;
 			while (!logit_validmu(mu, nobs)) {
 				if (ii > maxit) {
 					printf("Error: Inner loop 2; cannot correct step size\n");
-					exit(1);
+					asm("trap;")
 				}
 				ii++;
 				// Element-wise addition
