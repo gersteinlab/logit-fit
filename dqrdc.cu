@@ -15,6 +15,7 @@
 #include "dnrm2.cuh"
 #include "dswap.cuh"
 #include "daxpy.cuh"
+#include "d_sign.cuh"
 
 /* Table of constant values */
 
