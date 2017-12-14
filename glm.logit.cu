@@ -875,7 +875,7 @@ __device__ lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size,
 	work = (double *)malloc(2*p*sizeof(double));
 	
 	// DEBUG
-	// printf("Breakpoint Yocto\n");
+	printf("Breakpoint Yocto\n");
 	// exit(0);
 	
 	// Call dqrls
@@ -890,7 +890,7 @@ __device__ lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size,
 	}
 	
 	// DEBUG
-// 	printf("Breakpoint Zeta\n");
+ 	printf("Breakpoint Zeta\n");
 // 	for (int i = 0; i < (int)x.size(); i++) {
 // 		for (int j = 9; j < 10; j++) {
 // 			if (qr[i][j]) {
