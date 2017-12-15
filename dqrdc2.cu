@@ -141,6 +141,9 @@ __device__ static integer c__10 = 1;
     work -= work_offset;
     --qraux;
     --jpvt;
+    
+    // DEBUG
+		printf("Breakpoint 1b\n");
 
     /* Function Body */
     i__1 = *p;
@@ -153,6 +156,9 @@ __device__ static integer c__10 = 1;
 	}
 /* L70: */
     }
+    
+    // DEBUG
+		printf("Breakpoint 1c\n");
 
 /*     perform the householder reduction of x. */
 
@@ -217,7 +223,7 @@ L120:
 	}
 	
 	// DEBUG
-	printf("Breakpoint 1b\n");
+	// printf("Breakpoint 1b\n");
 	
 	if (x[l + l * x_dim1] != 0.) {
 			double xax;
@@ -227,7 +233,7 @@ L120:
 	}
 	
 	// DEBUG
-	printf("Breakpoint 1c\n");
+	// printf("Breakpoint 1c\n");
 	
 	i__2 = *n - l + 1;
 	d__1 = 1. / nrmxl;
