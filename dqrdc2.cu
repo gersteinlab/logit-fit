@@ -147,8 +147,8 @@ __device__ static integer c__10 = 1;
 
     /* Function Body */
     i__1 = *p;
-    for (j = 1; j <= i__1; ++j) {
-	qraux[j] = dnrm2_(n, &x[j * x_dim1 + 1], &c__10);
+    for (j = 0; j < i__1; ++j) {
+	qraux[j] = dnrm2_(n, &x[j * x_dim1], &c__10);
 	work[j + work_dim1] = qraux[j];
 	work[j + (work_dim1 << 1)] = qraux[j];
 	if (work[j + (work_dim1 << 1)] == 0.) {
