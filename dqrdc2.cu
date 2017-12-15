@@ -214,12 +214,20 @@ L120:
 	if (nrmxl == 0.) {
 	    goto L180;
 	}
+	
+	// DEBUG
+	printf("Breakpoint 1b\n");
+	
 	if (x[l + l * x_dim1] != 0.) {
 			double xax;
 			xax = (nrmxl >= 0 ? nrmxl : - nrmxl);
 			nrmxl = ( x[l + l * x_dim1] >= 0 ? xax : -xax);
 	    // nrmxl = d_sign(&nrmxl, &x[l + l * x_dim1]);
 	}
+	
+	// DEBUG
+	printf("Breakpoint 1c\n");
+	
 	i__2 = *n - l + 1;
 	d__1 = 1. / nrmxl;
 	dscal_(&i__2, &d__1, &x[l + l * x_dim1], &c__10);
