@@ -139,9 +139,15 @@ __device__ static integer c__1110 = 1110;
     y_dim1 = *n;
     y_offset = 1 + y_dim1;
     y -= y_offset;
+    
+    // DEBUG
+    printf("Breakpoint 1\n");
 
     /* Function Body */
     dqrdc2_(&x[x_offset], n, n, p, tol, k, &qraux[1], &jpvt[1], &work[1]);
+    
+    // DEBUG
+    printf("Breakpoint 2\n");
 
 /*     solve the truncated least squares problem for each rhs. */
 
