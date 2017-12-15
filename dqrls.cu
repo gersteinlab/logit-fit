@@ -145,7 +145,7 @@ __device__ static integer c__1110 = 1110;
     printf("Breakpoint 1\n");
 
     /* Function Body */
-    dqrdc2_(&x[x_offset], n, n, p, tol, k, &qraux[1], &jpvt[1], &work[1]);
+    dqrdc2_(x, n, n, p, tol, k, &qraux[1], &jpvt[1], &work[1]);
     
     // DEBUG
     printf("Breakpoint 2\n");
