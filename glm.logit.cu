@@ -1870,12 +1870,12 @@ int main (int argc, char* argv[]) {
 		y_cpu[i] = y[i];
 	}
 	
+	// DEBUG
+	printf("Breakpoint G1\n");
+	
 	double *y_gpu;
 	cudaMalloc((void**)&y_gpu, ysize*sizeof(double));
 	cudaMemcpy(y_gpu, y_cpu, ysize*sizeof(double), cudaMemcpyHostToDevice);
-	
-	// DEBUG
-	printf("Breakpoint G1\n");
 	
 	double **x_gpu, **x_gpu_b;
 	cudaMalloc((void**)&x_gpu, xsize*sizeof(double *));
