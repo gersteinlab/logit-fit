@@ -1874,6 +1874,9 @@ int main (int argc, char* argv[]) {
 	cudaMalloc((void**)&y_gpu, ysize*sizeof(double));
 	cudaMemcpy(y_gpu, y_cpu, ysize*sizeof(double), cudaMemcpyHostToDevice);
 	
+	// DEBUG
+	printf("Breakpoint G1\n");
+	
 	double **x_gpu, **x_gpu_b;
 	cudaMalloc((void**)&x_gpu, xsize*sizeof(double *));
 	x_gpu_b = (double **)malloc(xsize*sizeof(double *));
@@ -1887,6 +1890,9 @@ int main (int argc, char* argv[]) {
 	}
 	cudaMemcpy(x_gpu, x_gpu_b, xsize*sizeof(double *), cudaMemcpyHostToDevice);
 	
+	// DEBUG
+	printf("Breakpoint G2\n");
+	
 	int y_size_cpu = (int)ysize;
 	int *y_size;
 	cudaMalloc((void**)&y_size, sizeof(int));
@@ -1895,6 +1901,9 @@ int main (int argc, char* argv[]) {
 	int *x_size;
 	cudaMalloc((void**)&x_size, sizeof(int));
 	cudaMemcpy(x_size, &x_size_cpu, sizeof(int), cudaMemcpyHostToDevice);
+	
+	// DEBUG
+	printf("Breakpoint G3\n");
 	
 	int *lm_pivot_gpu;
 	cudaMalloc((void**)&lm_pivot_gpu, ysize*sizeof(int));
@@ -1921,6 +1930,9 @@ int main (int argc, char* argv[]) {
 	
 	double *prefit_y_gpu;
 	cudaMalloc((void**)&prefit_y_gpu, ysize*sizeof(double));
+	
+	// DEBUG
+	printf("Breakpoint G4\n");
 	
 	double **prefit_x_gpu, **prefit_x_gpu_b;
 	cudaMalloc((void**)&prefit_x_gpu, xisize*sizeof(double *));
