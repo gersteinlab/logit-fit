@@ -1862,6 +1862,7 @@ int main (int argc, char* argv[]) {
 	
 	// DEBUG
 	printf("Breakpoint Gamma\n");
+	printf("ysize: %d\n", ysize);
 	// exit(0);
 	
 	// CUDA stuff
