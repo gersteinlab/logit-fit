@@ -1955,6 +1955,9 @@ int main (int argc, char* argv[]) {
 	fit* outfit;
 	cudaMalloc((void**)&outfit, sizeof(fit));
 	
+	// DEBUG
+	printf("Breakpoint Malta\n");
+	
 	// Do the actual glm_logit fitting
 	// Launch CUDA kernels
 	apportionWork<<<NUM_BLOCKS, THREADS_PER_BLOCK>>>(y_gpu, x_gpu, y_size, x_size, lm_pivot_gpu, good_gpu, mu_gpu, eta_gpu, devold_vec_gpu, coef_gpu, coefold_gpu, w_gpu, varmu_gpu, mu_eta_gpu, z_gpu, prefit_y_gpu, prefit_x_gpu, lm_coefficients_gpu, start_gpu, residuals_gpu, Rmat_gpu, wt_gpu, wtdmu_vec_gpu, weights_gpu);
