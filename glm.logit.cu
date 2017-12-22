@@ -1716,7 +1716,7 @@ int main (int argc, char* argv[]) {
  		// init_theta = atof(argv[3]);
  	
  	// DEBUG
- 	printf("Breakpoint Sigma\n");
+ 	// printf("Breakpoint Sigma\n");
  	
  	// Data structures for imported data
  	double y[1024];
@@ -1775,7 +1775,7 @@ int main (int argc, char* argv[]) {
 	double x_tr[1024][1024];
 	
 	// DEBUG
-	printf("Breakpoint Delta\n");
+	// printf("Breakpoint Delta\n");
 	
 	// Bring predictor file data into memory
 	FILE *xfile_ptr = fopen(x_file, "r");
@@ -1861,19 +1861,19 @@ int main (int argc, char* argv[]) {
 	int xisize = row;
 	
 	// DEBUG
-	printf("Breakpoint Gamma\n");
-	printf("ysize: %d\n", ysize);
+	// printf("Breakpoint Gamma\n");
+	// printf("ysize: %d\n", ysize);
 	// exit(0);
 	
 	// CUDA stuff
 	double *y_cpu = (double *)malloc(ysize*sizeof(double));
 	for (unsigned int i = 0; i < ysize; i++) {
 		y_cpu[i] = y[i];
-		printf("y: %f\n", y_cpu[i]); // DEBUG
+		// printf("y: %f\n", y_cpu[i]); // DEBUG
 	}
 	
 	// DEBUG
-	printf("Breakpoint G1\n");
+	// printf("Breakpoint G1\n");
 	
 	double *y_gpu;
 	cudaMalloc((void**)&y_gpu, ysize*sizeof(double));
@@ -1893,7 +1893,7 @@ int main (int argc, char* argv[]) {
 	cudaMemcpy(x_gpu, x_gpu_b, xsize*sizeof(double *), cudaMemcpyHostToDevice);
 	
 	// DEBUG
-	printf("Breakpoint G2\n");
+	// printf("Breakpoint G2\n");
 	
 	int y_size_cpu = (int)ysize;
 	int *y_size;
@@ -1905,7 +1905,7 @@ int main (int argc, char* argv[]) {
 	cudaMemcpy(x_size, &x_size_cpu, sizeof(int), cudaMemcpyHostToDevice);
 	
 	// DEBUG
-	printf("Breakpoint G3\n");
+	// printf("Breakpoint G3\n");
 	
 	int *lm_pivot_gpu;
 	cudaMalloc((void**)&lm_pivot_gpu, ysize*sizeof(int));
@@ -1934,7 +1934,7 @@ int main (int argc, char* argv[]) {
 	cudaMalloc((void**)&prefit_y_gpu, ysize*sizeof(double));
 	
 	// DEBUG
-	printf("Breakpoint G4\n");
+	// printf("Breakpoint G4\n");
 	
 	double **prefit_x_gpu, **prefit_x_gpu_b;
 	cudaMalloc((void**)&prefit_x_gpu, xisize*sizeof(double *));
@@ -1970,7 +1970,7 @@ int main (int argc, char* argv[]) {
 	cudaMalloc((void**)&outfit, sizeof(fit));
 	
 	// DEBUG
-	printf("Breakpoint Malta\n");
+	// printf("Breakpoint Malta\n");
 	
 	// Do the actual glm_logit fitting
 	// Launch CUDA kernels
