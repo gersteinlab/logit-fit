@@ -149,10 +149,10 @@ __device__ static integer c__10 = 1;
     i__1 = *p;
     for (j = 0; j < i__1; ++j) {
 	qraux[j] = dnrm2_(n, &x[j * x_dim1], &c__10);
+	work[j + 0*work_dim1] = qraux[j];
 	work[j + work_dim1] = qraux[j];
-	work[j + (work_dim1 << 1)] = qraux[j];
-	if (work[j + (work_dim1 << 1)] == 0.) {
-	    work[j + (work_dim1 << 1)] = 1.;
+	if (work[j + work_dim1] == 0.) {
+	    work[j + work_dim1] = 1.;
 	}
 /* L70: */
     }
