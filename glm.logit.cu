@@ -1716,7 +1716,7 @@ int main (int argc, char* argv[]) {
  		// init_theta = atof(argv[3]);
  	
  	// DEBUG
- 	// printf("Breakpoint Sigma\n");
+ 	printf("Breakpoint Sigma\n");
  	
  	// Data structures for imported data
  	double y[1024];
@@ -1775,7 +1775,7 @@ int main (int argc, char* argv[]) {
 	double x_tr[1024][1024];
 	
 	// DEBUG
-	// printf("Breakpoint Delta\n");
+	printf("Breakpoint Delta\n");
 	
 	// Bring predictor file data into memory
 	FILE *xfile_ptr = fopen(x_file, "r");
@@ -1861,7 +1861,7 @@ int main (int argc, char* argv[]) {
 	int xisize = row;
 	
 	// DEBUG
-	// printf("Breakpoint Gamma\n");
+	printf("Breakpoint Gamma\n");
 	// exit(0);
 	
 	// CUDA stuff
