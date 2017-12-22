@@ -1869,6 +1869,7 @@ int main (int argc, char* argv[]) {
 	double *y_cpu = (double *)malloc(ysize*sizeof(double));
 	for (unsigned int i = 0; i < ysize; i++) {
 		y_cpu[i] = y[i];
+		printf("y: %f\n", y_cpu[i]); // DEBUG
 	}
 	
 	// DEBUG
