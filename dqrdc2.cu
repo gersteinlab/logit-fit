@@ -107,7 +107,7 @@ __device__ static integer c__10 = 1;
 	doublereal *work)
 {
     /* System generated locals */
-    integer x_dim1, x_offset, work_dim1, work_offset, i__2, i__3;
+    int x_dim1, x_offset, work_dim1, work_offset, i__2, i__3;
     doublereal d__1, d__2;
 
     /* Builtin functions */
