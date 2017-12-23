@@ -107,14 +107,14 @@ __device__ static integer c__10 = 1;
 	doublereal *work)
 {
     /* System generated locals */
-    integer x_dim1, x_offset, work_dim1, work_offset, i__1, i__2, i__3;
+    integer x_dim1, x_offset, work_dim1, work_offset, i__2, i__3;
     doublereal d__1, d__2;
 
     /* Builtin functions */
     // __device__ double d_sign(doublereal *, doublereal *); // sqrt(doublereal);
 
     /* Local variables */
-    integer i__, j, l;
+    integer i__, l;
     doublereal t, tt;
     integer lp1, lup;
     doublereal ttt;
@@ -146,8 +146,8 @@ __device__ static integer c__10 = 1;
 		printf("Breakpoint 1b\n");
 
     /* Function Body */
-    i__1 = *p;
-    for (j = 0; j < i__1; ++j) {
+    int i__1 = *p;
+    for (int j = 0; j < i__1; ++j) {
 	qraux[j] = dnrm2_(n, &x[j * x_dim1], &c__10);
 	work[j + 0*work_dim1] = qraux[j];
 	work[j + work_dim1] = qraux[j];
