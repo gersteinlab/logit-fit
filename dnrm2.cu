@@ -127,7 +127,7 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
 	for (ix = 0; ix < i__1; ix += i__2) {
 	
 		// DEBUG
-    printf("Breakpoint A3\n");
+    printf("Breakpoint A3: %d\n", ix);
 	
 	    if (x[ix] != 0.) {
 		absxi = (d__1 = x[ix], abs(d__1));
