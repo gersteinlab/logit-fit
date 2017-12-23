@@ -15,7 +15,7 @@
 
 /* Table of constant values */
 
-__device__ static integer c__1110 = 1110;
+__device__ static int c__1110 = 1110;
 
 
 /*     dqrfit is a subroutine to compute least squares solutions */
@@ -50,7 +50,7 @@ __device__ static integer c__1110 = 1110;
 /*               in the solution.  columns are pivoted out of */
 /*               decomposition if */
 
-/*        jpvt   integer(p) */
+/*        jpvt   int(p) */
 /*               the values in jpvt are permuted in the same */
 /*               way as the columns of x.  this can be useful */
 /*               in unscrambling coefficients etc. */
@@ -77,7 +77,7 @@ __device__ static integer c__1110 = 1110;
 /*               the initial p elements of this vector are */
 /*               permuted in the same way as the columns of x. */
 
-/*        k      integer */
+/*        k      int */
 /*               k contains the number of columns used in the */
 /*               solution. */
 
@@ -98,22 +98,22 @@ __device__ static integer c__1110 = 1110;
 
 /*     dqrfit uses the linpack routines dqrdc and dqrsl. */
 
-/* Subroutine */ __device__ int dqrls_(doublereal *x, integer *n, integer *p, doublereal 
-	*y, integer *ny, doublereal *tol, doublereal *b, doublereal *rsd, 
-	doublereal *qty, integer *k, integer *jpvt, doublereal *qraux, 
+/* Subroutine */ __device__ int dqrls_(doublereal *x, int *n, int *p, doublereal 
+	*y, int *ny, doublereal *tol, doublereal *b, doublereal *rsd, 
+	doublereal *qty, int *k, int *jpvt, doublereal *qraux, 
 	doublereal *work)
 {
     /* System generated locals */
-    integer x_dim1, x_offset, y_dim1, y_offset, b_dim1, b_offset, rsd_dim1, 
+    int x_dim1, x_offset, y_dim1, y_offset, b_dim1, b_offset, rsd_dim1, 
 	    rsd_offset, qty_dim1, qty_offset, i__1, i__2;
 
     /* Local variables */
-    integer i__, j, jj, kk, info;
-    extern __device__ /* Subroutine */ int dqrsl_(doublereal *, integer *, integer *, 
-	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
-	     doublereal *, doublereal *, doublereal *, integer *, integer *), 
-	    dqrdc2_(doublereal *, integer *, integer *, integer *, doublereal 
-	    *, integer *, doublereal *, integer *, doublereal *);
+    int i__, j, jj, kk, info;
+    extern __device__ /* Subroutine */ int dqrsl_(doublereal *, int *, int *, 
+	    int *, doublereal *, doublereal *, doublereal *, doublereal *,
+	     doublereal *, doublereal *, doublereal *, int *, int *), 
+	    dqrdc2_(doublereal *, int *, int *, int *, doublereal 
+	    *, int *, doublereal *, int *, doublereal *);
 
 
 /*     internal variables. */

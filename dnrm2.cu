@@ -67,7 +67,7 @@
 /* > \endverbatim */
 /* > */
 /*  ===================================================================== */
-__device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
+__device__ doublereal dnrm2_(int *n, doublereal *x, int *incx)
 {
     /* System generated locals */
     int i__1, i__2;

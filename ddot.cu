@@ -25,7 +25,7 @@
 /*       DOUBLE PRECISION FUNCTION DDOT(N,DX,INCX,DY,INCY) */
 
 /*       .. Scalar Arguments .. */
-/*       INTEGER INCX,INCY,N */
+/*       int INCX,INCY,N */
 /*       .. */
 /*       .. Array Arguments .. */
 /*       DOUBLE PRECISION DX(*),DY(*) */
@@ -63,15 +63,15 @@
 /* > \endverbatim */
 /* > */
 /*  ===================================================================== */
-__device__ doublereal ddot_(integer *n, doublereal *dx, integer *incx, doublereal *dy, 
-	integer *incy)
+__device__ doublereal ddot_(int *n, doublereal *dx, int *incx, doublereal *dy, 
+	int *incy)
 {
     /* System generated locals */
-    integer i__1;
+    int i__1;
     doublereal ret_val;
 
     /* Local variables */
-    integer i__, m, ix, iy, mp1;
+    int i__, m, ix, iy, mp1;
     doublereal dtemp;
 
 
@@ -92,8 +92,8 @@ __device__ doublereal ddot_(integer *n, doublereal *dx, integer *incx, doublerea
 /*     .. Intrinsic Functions .. */
 /*     .. */
     /* Parameter adjustments */
-    --dy;
-    --dx;
+    // --dy;
+    // --dx;
 
     /* Function Body */
     ret_val = 0.;
@@ -111,7 +111,7 @@ __device__ doublereal ddot_(integer *n, doublereal *dx, integer *incx, doublerea
 	m = *n % 5;
 	if (m != 0) {
 	    i__1 = m;
-	    for (i__ = 1; i__ <= i__1; ++i__) {
+	    for (i__ = 0; i__ < i__1; ++i__) {
 		dtemp += dx[i__] * dy[i__];
 	    }
 	    if (*n < 5) {
@@ -121,7 +121,7 @@ __device__ doublereal ddot_(integer *n, doublereal *dx, integer *incx, doublerea
 	}
 	mp1 = m + 1;
 	i__1 = *n;
-	for (i__ = mp1; i__ <= i__1; i__ += 5) {
+	for (i__ = mp1-1; i__ < i__1; i__ += 5) {
 	    dtemp = dtemp + dx[i__] * dy[i__] + dx[i__ + 1] * dy[i__ + 1] + 
 		    dx[i__ + 2] * dy[i__ + 2] + dx[i__ + 3] * dy[i__ + 3] + 
 		    dx[i__ + 4] * dy[i__ + 4];
@@ -140,7 +140,7 @@ __device__ doublereal ddot_(integer *n, doublereal *dx, integer *incx, doublerea
 	    iy = (-(*n) + 1) * *incy + 1;
 	}
 	i__1 = *n;
-	for (i__ = 1; i__ <= i__1; ++i__) {
+	for (i__ = 0; i__ < i__1; ++i__) {
 	    dtemp += dx[ix] * dy[iy];
 	    ix += *incx;
 	    iy += *incy;

@@ -26,7 +26,7 @@
 
 /*       .. Scalar Arguments .. */
 /*       DOUBLE PRECISION DA */
-/*       INTEGER INCX,INCY,N */
+/*       int INCX,INCY,N */
 /*       .. */
 /*       .. Array Arguments .. */
 /*       DOUBLE PRECISION DX(*),DY(*) */
@@ -64,14 +64,14 @@
 /* > \endverbatim */
 /* > */
 /*  ===================================================================== */
-/* Subroutine */ __device__ int daxpy_(integer *n, doublereal *da, doublereal *dx, 
-	integer *incx, doublereal *dy, integer *incy)
+/* Subroutine */ __device__ int daxpy_(int *n, doublereal *da, doublereal *dx, 
+	int *incx, doublereal *dy, int *incy)
 {
     /* System generated locals */
-    integer i__1;
+    int i__1;
 
     /* Local variables */
-    integer i__, m, ix, iy, mp1;
+    int i__, m, ix, iy, mp1;
 
 
 /*  -- Reference BLAS level1 routine (version 3.4.0) -- */
@@ -91,8 +91,8 @@
 /*     .. Intrinsic Functions .. */
 /*     .. */
     /* Parameter adjustments */
-    --dy;
-    --dx;
+    // --dy;
+    // --dx;
 
     /* Function Body */
     if (*n <= 0) {
@@ -111,7 +111,7 @@
 	m = *n % 4;
 	if (m != 0) {
 	    i__1 = m;
-	    for (i__ = 1; i__ <= i__1; ++i__) {
+	    for (i__ = 0; i__ < i__1; ++i__) {
 		dy[i__] += *da * dx[i__];
 	    }
 	}
@@ -120,7 +120,7 @@
 	}
 	mp1 = m + 1;
 	i__1 = *n;
-	for (i__ = mp1; i__ <= i__1; i__ += 4) {
+	for (i__ = mp1-1; i__ < i__1; i__ += 4) {
 	    dy[i__] += *da * dx[i__];
 	    dy[i__ + 1] += *da * dx[i__ + 1];
 	    dy[i__ + 2] += *da * dx[i__ + 2];
@@ -140,7 +140,7 @@
 	    iy = (-(*n) + 1) * *incy + 1;
 	}
 	i__1 = *n;
-	for (i__ = 1; i__ <= i__1; ++i__) {
+	for (i__ = 0; i__ < i__1; ++i__) {
 	    dy[iy] += *da * dx[ix];
 	    ix += *incx;
 	    iy += *incy;
