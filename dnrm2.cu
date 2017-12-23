@@ -105,7 +105,7 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
     if (*n < 1 || *incx < 1) {
 	norm = 0.;
     } else if (*n == 1) {
-	norm = abs(x[1]);
+	norm = abs(x[0]);
     } else {
 	scale = 0.;
 	ssq = 1.;
@@ -115,7 +115,7 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
 
 	i__1 = (*n - 1) * *incx + 1;
 	i__2 = *incx;
-	for (ix = 1; i__2 < 0 ? ix >= i__1 : ix <= i__1; ix += i__2) {
+	for (ix = 0; i__2 < 0 ? ix > i__1 : ix < i__1; ix += i__2) {
 	    if (x[ix] != 0.) {
 		absxi = (d__1 = x[ix], abs(d__1));
 		if (scale < absxi) {
