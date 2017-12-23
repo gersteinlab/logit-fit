@@ -19,7 +19,7 @@
 
 /* Table of constant values */
 
-__device__ static integer c__10 = 1;
+__device__ static int c__10 = 1;
 
 
 /*     dqrdc2 uses householder transformations to compute the qr */
@@ -42,13 +42,13 @@ __device__ static integer c__10 = 1;
 /*                x contains the matrix whose decomposition is to be */
 /*                computed. */
 
-/*        ldx     integer. */
+/*        ldx     int. */
 /*                ldx is the leading dimension of the array x. */
 
-/*        n       integer. */
+/*        n       int. */
 /*                n is the number of rows of the matrix x. */
 
-/*        p       integer. */
+/*        p       int. */
 /*                p is the number of columns of the matrix x. */
 
 /*        tol     double precision */
@@ -56,8 +56,8 @@ __device__ static integer c__10 = 1;
 /*                determine the subset of the columns of x */
 /*                included in the solution. */
 
-/*        jpvt    integer(p). */
-/*                integers which are swapped in the same way as the */
+/*        jpvt    int(p). */
+/*                ints which are swapped in the same way as the */
 /*                the columns of x during pivoting.  on entry these */
 /*                should be set equal to the column indices of the */
 /*                columns of the x matrix (typically 1 to p). */
@@ -76,7 +76,7 @@ __device__ static integer c__10 = 1;
 /*                of the original matrix x but that of x */
 /*                with its columns permuted as described by jpvt. */
 
-/*        k       integer. */
+/*        k       int. */
 /*                k contains the number of columns of x judged */
 /*                to be linearly independent. */
 
@@ -102,27 +102,27 @@ __device__ static integer c__10 = 1;
 /*     blas daxpy,ddot,dscal,dnrm2 */
 /*     fortran dabs,dmax1,min0,dsqrt */
 
-/* Subroutine */ __device__ int dqrdc2_(doublereal *x, integer *ldx, integer *n, integer 
-	*p, doublereal *tol, integer *k, doublereal *qraux, integer *jpvt, 
+/* Subroutine */ __device__ int dqrdc2_(doublereal *x, int *ldx, int *n, int 
+	*p, doublereal *tol, int *k, doublereal *qraux, int *jpvt, 
 	doublereal *work)
 {
     /* System generated locals */
-    integer x_offset, work_dim1, work_offset, i__2, i__3;
+    int x_offset, work_offset, i__2, i__3;
     doublereal d__1, d__2;
 
     /* Builtin functions */
     // __device__ double d_sign(doublereal *, doublereal *); // sqrt(doublereal);
 
     /* Local variables */
-    integer i__, l;
+    int i__;
     doublereal t, tt;
-    integer lp1, lup;
+    int lp1, lup;
     doublereal ttt;
-//     extern __device__ doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
-// 	    integer *), dnrm2_(integer *, doublereal *, integer *);
-    extern __device__ /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
-	    integer *); // daxpy_(integer *, doublereal *, doublereal *, integer 
-	    // *, doublereal *, integer *);
+//     extern __device__ doublereal ddot_(int *, doublereal *, int *, doublereal *, 
+// 	    int *), dnrm2_(int *, doublereal *, int *);
+    extern __device__ /* Subroutine */ int dscal_(int *, doublereal *, doublereal *, 
+	    int *); // daxpy_(int *, doublereal *, doublereal *, int 
+	    // *, doublereal *, int *);
     doublereal nrmxl;
 
 
@@ -136,7 +136,7 @@ __device__ static integer c__10 = 1;
     int x_dim1 = *ldx;
     x_offset = 1 + x_dim1;
     // x -= x_offset;
-    work_dim1 = *p;
+    int work_dim1 = *p;
     work_offset = 1 + work_dim1;
     // work -= work_offset;
     // --qraux;
@@ -165,7 +165,7 @@ __device__ static integer c__10 = 1;
     lup = min(*n,*p);
     *k = *p + 1;
     i__1 = lup;
-    for (l = 1; l <= i__1; ++l) {
+    for (int l = 0; l < i__1; ++l) {
 
 /*     previous version only cycled l to lup */
 
@@ -181,10 +181,10 @@ L80:
 	}
 	lp1 = l + 1;
 	i__2 = *n;
-	for (i__ = 1; i__ <= i__2; ++i__) {
+	for (i__ = 0; i__ < i__2; ++i__) {
 	    t = x[i__ + l * x_dim1];
 	    i__3 = *p;
-	    for (int j = lp1; j <= i__3; ++j) {
+	    for (int j = lp1-1; j < i__3; ++j) {
 		x[i__ + (j - 1) * x_dim1] = x[i__ + j * x_dim1];
 /* L90: */
 	    }
@@ -196,7 +196,7 @@ L80:
 	tt = work[l + work_dim1];
 	ttt = work[l + (work_dim1 << 1)];
 	i__2 = *p;
-	for (int j = lp1; j <= i__2; ++j) {
+	for (int j = lp1-1; j < i__2; ++j) {
 	    jpvt[j - 1] = jpvt[j];
 	    qraux[j - 1] = qraux[j];
 	    work[j - 1 + work_dim1] = work[j + work_dim1];
@@ -205,8 +205,8 @@ L80:
 	}
 	jpvt[*p] = i__;
 	qraux[*p] = t;
-	work[*p + work_dim1] = tt;
-	work[*p + (work_dim1 << 1)] = ttt;
+	work[*p + 0*work_dim1] = tt;
+	work[*p + work_dim1] = ttt;
 	--(*k);
 	goto L80;
 L120:
