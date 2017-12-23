@@ -879,8 +879,8 @@ __device__ lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size,
 	// exit(0);
 	
 	// Call dqrls
-	dqrls_(qr, (integer *)&n, (integer *)&p, y_for, (integer *)&ny, &rtol, coefficients, residuals, effects, (integer *)&rank, 
-				(integer *)pivot, qraux, work);
+	dqrls_(qr, &n, &p, y_for, &ny, &rtol, coefficients, residuals, effects, &rank, 
+				pivot, qraux, work);
 				
 	for	(int i = 0; i < p; i++) {
 		if (pivot[i] != i+1) {
