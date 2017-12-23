@@ -100,6 +100,9 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
 /*     .. */
     /* Parameter adjustments */
     // --x;
+    
+    // DEBUG
+    printf("Breakpoint A1\n");
 
     /* Function Body */
     if (*n < 1 || *incx < 1) {
@@ -113,9 +116,16 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
 /*        auxiliary routine: */
 /*        CALL DLASSQ( N, X, INCX, SCALE, SSQ ) */
 
+	// DEBUG
+  printf("Breakpoint A2\n");
+
 	i__1 = (*n - 1) * *incx + 1;
 	i__2 = *incx;
 	for (ix = 0; i__2 < 0 ? ix > i__1 : ix < i__1; ix += i__2) {
+	
+		// DEBUG
+    printf("Breakpoint A3\n");
+	
 	    if (x[ix] != 0.) {
 		absxi = (d__1 = x[ix], abs(d__1));
 		if (scale < absxi) {
@@ -133,6 +143,9 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
 	}
 	norm = scale * sqrt(ssq);
     }
+    
+  // DEBUG
+  printf("Breakpoint A4\n");
 
     ret_val = norm;
     return ret_val;
