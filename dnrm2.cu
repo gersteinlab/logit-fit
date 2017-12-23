@@ -10,6 +10,7 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
+#include <stdio.h>
 #include "f2c.h"
 
 /* > \brief \b DNRM2 */
