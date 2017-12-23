@@ -248,7 +248,7 @@ L120:
 	    goto L170;
 	}
 	i__2 = *p;
-	for (j = lp1; j <= i__2; ++j) {
+	for (int j = lp1; j <= i__2; ++j) {
 	    i__3 = *n - l + 1;
 	    t = -ddot_(&i__3, &x[l + l * x_dim1], &c__10, &x[l + j * x_dim1], &
 		    c__10) / x[l + l * x_dim1];
