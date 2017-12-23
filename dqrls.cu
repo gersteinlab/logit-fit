@@ -127,19 +127,19 @@ __device__ static integer c__1110 = 1110;
     // --jpvt;
     x_dim1 = *n;
     x_offset = 1 + x_dim1;
-    x -= x_offset;
+    // x -= x_offset;
     qty_dim1 = *n;
     qty_offset = 1 + qty_dim1;
-    qty -= qty_offset;
+    // qty -= qty_offset;
     rsd_dim1 = *n;
     rsd_offset = 1 + rsd_dim1;
-    rsd -= rsd_offset;
+    // rsd -= rsd_offset;
     b_dim1 = *p;
     b_offset = 1 + b_dim1;
-    b -= b_offset;
+    // b -= b_offset;
     y_dim1 = *n;
     y_offset = 1 + y_dim1;
-    y -= y_offset;
+    // y -= y_offset;
     
     // DEBUG
     printf("Breakpoint 1\n");

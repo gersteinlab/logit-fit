@@ -135,10 +135,10 @@ __device__ static integer c__10 = 1;
     /* Parameter adjustments */
     x_dim1 = *ldx;
     x_offset = 1 + x_dim1;
-    x -= x_offset;
+    // x -= x_offset;
     work_dim1 = *p;
     work_offset = 1 + work_dim1;
-    work -= work_offset;
+    // work -= work_offset;
     // --qraux;
     // --jpvt;
     
