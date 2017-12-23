@@ -124,6 +124,11 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
 
 	i__1 = (*n - 1) * *incx + 1;
 	i__2 = *incx;
+	
+	// DEBUG
+	printf("i__1: %d\n", i__1);
+	printf("i__2: %d\n", i__2);
+	
 	for (int ix = 0; ix < i__1; ix += i__2) {
 	
 		// DEBUG
