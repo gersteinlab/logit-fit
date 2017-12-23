@@ -184,7 +184,7 @@ L80:
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    t = x[i__ + l * x_dim1];
 	    i__3 = *p;
-	    for (j = lp1; j <= i__3; ++j) {
+	    for (int j = lp1; j <= i__3; ++j) {
 		x[i__ + (j - 1) * x_dim1] = x[i__ + j * x_dim1];
 /* L90: */
 	    }
@@ -196,7 +196,7 @@ L80:
 	tt = work[l + work_dim1];
 	ttt = work[l + (work_dim1 << 1)];
 	i__2 = *p;
-	for (j = lp1; j <= i__2; ++j) {
+	for (int j = lp1; j <= i__2; ++j) {
 	    jpvt[j - 1] = jpvt[j];
 	    qraux[j - 1] = qraux[j];
 	    work[j - 1 + work_dim1] = work[j + work_dim1];
