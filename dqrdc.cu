@@ -19,7 +19,7 @@
 
 /* Table of constant values */
 
-__device__ static integer c__1 = 1;
+__device__ static int c__1 = 1;
 
 
 /*     dqrdc uses householder transformations to compute the qr */
@@ -33,17 +33,17 @@ __device__ static integer c__1 = 1;
 /*                x contains the matrix whose decomposition is to be */
 /*                computed. */
 
-/*        ldx     integer. */
+/*        ldx     int. */
 /*                ldx is the leading dimension of the array x. */
 
-/*        n       integer. */
+/*        n       int. */
 /*                n is the number of rows of the matrix x. */
 
-/*        p       integer. */
+/*        p       int. */
 /*                p is the number of columns of the matrix x. */
 
-/*        jpvt    integer(p). */
-/*                jpvt contains integers that control the selection */
+/*        jpvt    int(p). */
+/*                jpvt contains ints that control the selection */
 /*                of the pivot columns.  the k-th column x(k) of x */
 /*                is placed in one of three classes according to the */
 /*                value of jpvt(k). */
@@ -69,8 +69,8 @@ __device__ static integer c__1 = 1;
 /*                work is a work array.  work is not referenced if */
 /*                job .eq. 0. */
 
-/*        job     integer. */
-/*                job is an integer that initiates column pivoting. */
+/*        job     int. */
+/*                job is an int that initiates column pivoting. */
 /*                if job .eq. 0, no pivoting is done. */
 /*                if job .ne. 0, pivoting is done. */
 
@@ -101,33 +101,33 @@ __device__ static integer c__1 = 1;
 /*     blas daxpy,ddot,dscal,dswap,dnrm2 */
 /*     fortran dabs,dmax1,min0,dsqrt */
 
-/* Subroutine */ __device__ int dqrdc_(doublereal *x, integer *ldx, integer *n, integer *
-	p, doublereal *qraux, integer *jpvt, doublereal *work, integer *job)
+/* Subroutine */ __device__ int dqrdc_(doublereal *x, int *ldx, int *n, int *
+	p, doublereal *qraux, int *jpvt, doublereal *work, int *job)
 {
     /* System generated locals */
-    integer x_dim1, x_offset, i__1, i__2, i__3;
+    int x_dim1, x_offset, i__1, i__2, i__3;
     doublereal d__1, d__2;
 
     /* Builtin functions */
     // __device__ double d_sign(doublereal *, doublereal *); // sqrt(doublereal);
 
     /* Local variables */
-    integer j, l;
+    int j, l;
     doublereal t;
-    integer jj, jp, pl, pu;
+    int jj, jp, pl, pu;
     doublereal tt;
-    integer lp1, lup;
+    int lp1, lup;
     logical negj;
-//     extern __device__ doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
-// 	    integer *);
-    integer maxj;
-//     extern __device__ doublereal dnrm2_(integer *, doublereal *, integer *);
-    extern __device__ /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
-	    integer *); // dswap_(integer *, doublereal *, integer *, doublereal 
-	    // *, integer *);
+//     extern __device__ doublereal ddot_(int *, doublereal *, int *, doublereal *, 
+// 	    int *);
+    int maxj;
+//     extern __device__ doublereal dnrm2_(int *, doublereal *, int *);
+    extern __device__ /* Subroutine */ int dscal_(int *, doublereal *, doublereal *, 
+	    int *); // dswap_(int *, doublereal *, int *, doublereal 
+	    // *, int *);
     logical swapj;
-//     extern __device__ /* Subroutine */ int daxpy_(integer *, doublereal *, doublereal *, 
-// 	    integer *, doublereal *, integer *);
+//     extern __device__ /* Subroutine */ int daxpy_(int *, doublereal *, doublereal *, 
+// 	    int *, doublereal *, int *);
     doublereal nrmxl, maxnrm;
 
 
