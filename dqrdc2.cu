@@ -107,7 +107,7 @@ __device__ static integer c__10 = 1;
 	doublereal *work)
 {
     /* System generated locals */
-    int x_dim1, x_offset, work_dim1, work_offset, i__2, i__3;
+    integer x_offset, work_dim1, work_offset, i__2, i__3;
     doublereal d__1, d__2;
 
     /* Builtin functions */
@@ -133,7 +133,7 @@ __device__ static integer c__10 = 1;
 /*     compute the norms of the columns of x. */
 
     /* Parameter adjustments */
-    x_dim1 = *ldx;
+    int x_dim1 = *ldx;
     x_offset = 1 + x_dim1;
     // x -= x_offset;
     work_dim1 = *p;
