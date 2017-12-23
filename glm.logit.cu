@@ -1109,6 +1109,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	// printf("Breakpoint 2\n");
 	
 	// The iteratively reweighting L.S. iteration
+	double* w;
 	int iter = 0;
 	for (; iter < maxit; iter++) {
 		
@@ -1165,7 +1166,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		}
 		// vector<double> w;
 		num_index = 0;
-		double *w = (double *)malloc(num_true*sizeof(double));
+		w = (double *)malloc(num_true*sizeof(double));
 		for (unsigned int j = 0; j < nobs; j++) {
  			if (good[j] == true) {
 				double this_val = sqrt(pow(mu_eta_val[j],2.0))/varmu[j];
@@ -1458,9 +1459,11 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	// printf("Breakpoint 3d\n");
 	
   // vector<double> wt;
+  int num_index = 0;
   for (unsigned int i = 0; i < nobs; i++) {
   	if (good[i]) {
-  		wt[i] = pow(w[i],2.0);
+  		wt[i] = pow(w[num_index],2.0);
+  		num_index++;
   	} else {
   		wt[i] = 0.0;
   	}
