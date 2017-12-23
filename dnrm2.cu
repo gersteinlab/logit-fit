@@ -77,7 +77,7 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
     // double sqrt(doublereal);
 
     /* Local variables */
-    integer ix;
+    // integer ix;
     doublereal ssq, norm, scale, absxi;
 
 
@@ -124,7 +124,7 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
 
 	i__1 = (*n - 1) * *incx + 1;
 	i__2 = *incx;
-	for (ix = 0; ix < i__1; ix += i__2) {
+	for (int ix = 0; ix < i__1; ix += i__2) {
 	
 		// DEBUG
     printf("Breakpoint A3: %d\n", ix);
