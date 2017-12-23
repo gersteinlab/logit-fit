@@ -99,7 +99,7 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
 /*     .. Intrinsic Functions .. */
 /*     .. */
     /* Parameter adjustments */
-    --x;
+    // --x;
 
     /* Function Body */
     if (*n < 1 || *incx < 1) {

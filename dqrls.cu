@@ -122,9 +122,9 @@ __device__ static integer c__1110 = 1110;
 /*     reduce x. */
 
     /* Parameter adjustments */
-    --work;
-    --qraux;
-    --jpvt;
+    // --work;
+    // --qraux;
+    // --jpvt;
     x_dim1 = *n;
     x_offset = 1 + x_dim1;
     x -= x_offset;

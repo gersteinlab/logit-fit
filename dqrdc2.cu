@@ -139,8 +139,8 @@ __device__ static integer c__10 = 1;
     work_dim1 = *p;
     work_offset = 1 + work_dim1;
     work -= work_offset;
-    --qraux;
-    --jpvt;
+    // --qraux;
+    // --jpvt;
     
     // DEBUG
 		printf("Breakpoint 1b\n");
