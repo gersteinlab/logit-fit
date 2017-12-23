@@ -104,6 +104,8 @@ __device__ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
     
     // DEBUG
     printf("Breakpoint A1\n");
+    printf("n: %d\n", *n);
+    printf("incx: %d\n", *incx);
 
     /* Function Body */
     if (*n < 1 || *incx < 1) {
