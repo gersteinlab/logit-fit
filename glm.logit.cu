@@ -1032,7 +1032,7 @@ __device__ lmfit Cdqrls(double** x, double* y, double tol, bool chk, int y_size,
  * This is really a pared down glm_fit that only implements the portion needed
  * for the logistic regression fit
  */
-__device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm_pivot, bool* good, double* mu, double* eta, double* devold_vec, double* coef, double* coefold, double* w, double* varmu, double* mu_eta_val, double* z, double* prefit_y, double** prefit_x, double* lm_coefficients, double* start, double* residuals, double** Rmat, double* wt, double* wtdmu_vec, double* weights) {
+__device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* lm_pivot, bool* good, double* mu, double* eta, double* devold_vec, double* coef, double* coefold, double* varmu, double* mu_eta_val, double** prefit_x, double* lm_coefficients, double* start, double* residuals, double** Rmat, double* wt, double* wtdmu_vec, double* weights) {
 
 	// DEBUG
 	// printf("Breakpoint 1\n");
@@ -1135,10 +1135,12 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		
 		// Save the good ones (i.e. the ones where mu_eta_val is nonzero)
 		// good.clear();
+		unsigned int num_true = 0;
 		unsigned int num_false = 0;
 		for (unsigned int i = 0; i < nobs; i++) {
 			if (mu_eta_val[i] != 0) {
 				good[i] = true;
+				num_true++;
 			} else {
 				good[i] = false;
 				num_false++;
@@ -1152,17 +1154,23 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		}
 		
 		// vector<double> z;
+		int num_index = 0;
+		double *z = (double *)malloc(num_true*sizeof(double));
 		for (unsigned int j = 0; j < nobs; j++) {
 			if (good[j] == true) {
 				double this_val = eta[j] + (y[j] - mu[j])/mu_eta_val[j];
 				z[j] = this_val;
+				num_index++;
 			}
 		}
 		// vector<double> w;
+		num_index = 0;
+		double *w = (double *)malloc(num_true*sizeof(double));
 		for (unsigned int j = 0; j < nobs; j++) {
-			if (good[j] == true) {
+ 			if (good[j] == true) {
 				double this_val = sqrt(pow(mu_eta_val[j],2.0))/varmu[j];
 				w[j] = this_val;
+				num_index++;
 			}
 		}
 		
@@ -1171,14 +1179,18 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		// vector<double> prefit_y;
 		for (unsigned int j = 0; j < nvars; j++) {
 			// vector<double> temp;
+			num_index = 0;
+			prefit_x[j] = (double *)malloc(num_true*sizeof(double));
 			for (unsigned int k = 0; k < nobs; k++) {
 				if (good[k] == true) {
-					prefit_x[j][k] = x[j][k] * w[k];
+					prefit_x[j][num_index] = x[j][k] * w[num_index];
+					num_index++;
 				}
 			}
 			// prefit_x.push_back(temp);
 		}
 		
+		double *prefit_y = (double *)malloc(num_true*sizeof(double));
 		for (unsigned int j = 0; j < nobs; j++) {
 			prefit_y[j] = z[j] * w[j];
 		}
@@ -1676,14 +1688,14 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	printf("%s\n\n", bool_out);
 }
 
-__global__ void apportionWork(double* y_gpu, double** x_gpu, int* y_size, int* x_size, int* lm_pivot_gpu, bool* good_gpu, double* mu_gpu, double* eta_gpu, double* devold_vec_gpu, double* coef_gpu, double* coefold_gpu, double* w_gpu, double* varmu_gpu, double* mu_eta_gpu, double* z_gpu, double* prefit_y_gpu, double** prefit_x_gpu, double* lm_coefficients_gpu, double* start_gpu, double* residuals_gpu, double** Rmat_gpu, double* wt_gpu, double* wtdmu_vec_gpu, double* weights_gpu) {
+__global__ void apportionWork(double* y_gpu, double** x_gpu, int* y_size, int* x_size, int* lm_pivot_gpu, bool* good_gpu, double* mu_gpu, double* eta_gpu, double* devold_vec_gpu, double* coef_gpu, double* coefold_gpu, double* varmu_gpu, double* mu_eta_gpu, double** prefit_x_gpu, double* lm_coefficients_gpu, double* start_gpu, double* residuals_gpu, double** Rmat_gpu, double* wt_gpu, double* wtdmu_vec_gpu, double* weights_gpu) {
 	
 	// Which thread am I?
 	int tid = threadIdx.x + blockIdx.x * blockDim.x;
 	
 	// For now, we're just going to have thread 0 run a logistic regression
 	if (tid == 0) {
-		glm_fit(y_gpu, x_gpu, y_size, x_size, lm_pivot_gpu, good_gpu, mu_gpu, eta_gpu, devold_vec_gpu, coef_gpu, coefold_gpu, w_gpu, varmu_gpu, mu_eta_gpu, z_gpu, prefit_y_gpu, prefit_x_gpu, lm_coefficients_gpu, start_gpu, residuals_gpu, Rmat_gpu, wt_gpu, wtdmu_vec_gpu, weights_gpu);
+		glm_fit(y_gpu, x_gpu, y_size, x_size, lm_pivot_gpu, good_gpu, mu_gpu, eta_gpu, devold_vec_gpu, coef_gpu, coefold_gpu, varmu_gpu, mu_eta_gpu, prefit_x_gpu, lm_coefficients_gpu, start_gpu, residuals_gpu, Rmat_gpu, wt_gpu, wtdmu_vec_gpu, weights_gpu);
 	}
 }
 
@@ -1921,29 +1933,29 @@ int main (int argc, char* argv[]) {
 	cudaMalloc((void**)&coef_gpu, xsize*sizeof(double));
 	double *coefold_gpu;
 	cudaMalloc((void**)&coefold_gpu, xsize*sizeof(double));
-	double *w_gpu;
-	cudaMalloc((void**)&w_gpu, ysize*sizeof(double));
+// 	double *w_gpu;
+// 	cudaMalloc((void**)&w_gpu, ysize*sizeof(double));
 	double *varmu_gpu;
 	cudaMalloc((void**)&varmu_gpu, ysize*sizeof(double));
 	double *mu_eta_gpu;
 	cudaMalloc((void**)&mu_eta_gpu, ysize*sizeof(double));
-	double *z_gpu;
-	cudaMalloc((void**)&z_gpu, ysize*sizeof(double));
-	
-	double *prefit_y_gpu;
-	cudaMalloc((void**)&prefit_y_gpu, ysize*sizeof(double));
+// 	double *z_gpu;
+// 	cudaMalloc((void**)&z_gpu, ysize*sizeof(double));
+// 	
+// 	double *prefit_y_gpu;
+// 	cudaMalloc((void**)&prefit_y_gpu, ysize*sizeof(double));
 	
 	// DEBUG
 	// printf("Breakpoint G4\n");
 	
-	double **prefit_x_gpu, **prefit_x_gpu_b;
+	double **prefit_x_gpu;
 	cudaMalloc((void**)&prefit_x_gpu, xisize*sizeof(double *));
-	prefit_x_gpu_b = (double **)malloc(xisize*sizeof(double *));
-	for (int i = 0; i < (int)xsize; i++) {
-		cudaMalloc((void**)&prefit_x_gpu_b[i], xsize*sizeof(double));
-		// cudaMemcpy(prefit_x_gpu_b[i], x[i], x[i].size()*sizeof(double), cudaMemcpyHostToDevice);
-	}
-	cudaMemcpy(prefit_x_gpu, prefit_x_gpu_b, xisize*sizeof(double *), cudaMemcpyHostToDevice);
+// 	prefit_x_gpu_b = (double **)malloc(xisize*sizeof(double *));
+// 	for (int i = 0; i < (int)xsize; i++) {
+// 		cudaMalloc((void**)&prefit_x_gpu_b[i], xsize*sizeof(double));
+// 		// cudaMemcpy(prefit_x_gpu_b[i], x[i], x[i].size()*sizeof(double), cudaMemcpyHostToDevice);
+// 	}
+// 	cudaMemcpy(prefit_x_gpu, prefit_x_gpu_b, xisize*sizeof(double *), cudaMemcpyHostToDevice);
 	
 	double* lm_coefficients_gpu;
 	cudaMalloc((void**)&lm_coefficients_gpu, xsize*sizeof(double));
@@ -1974,7 +1986,7 @@ int main (int argc, char* argv[]) {
 	
 	// Do the actual glm_logit fitting
 	// Launch CUDA kernels
-	apportionWork<<<NUM_BLOCKS, THREADS_PER_BLOCK>>>(y_gpu, x_gpu, y_size, x_size, lm_pivot_gpu, good_gpu, mu_gpu, eta_gpu, devold_vec_gpu, coef_gpu, coefold_gpu, w_gpu, varmu_gpu, mu_eta_gpu, z_gpu, prefit_y_gpu, prefit_x_gpu, lm_coefficients_gpu, start_gpu, residuals_gpu, Rmat_gpu, wt_gpu, wtdmu_vec_gpu, weights_gpu);
+	apportionWork<<<NUM_BLOCKS, THREADS_PER_BLOCK>>>(y_gpu, x_gpu, y_size, x_size, lm_pivot_gpu, good_gpu, mu_gpu, eta_gpu, devold_vec_gpu, coef_gpu, coefold_gpu, varmu_gpu, mu_eta_gpu, prefit_x_gpu, lm_coefficients_gpu, start_gpu, residuals_gpu, Rmat_gpu, wt_gpu, wtdmu_vec_gpu, weights_gpu);
 	GPUerrchk(cudaPeekAtLastError());
 	cudaDeviceSynchronize();
 	GPUerrchk(cudaPeekAtLastError());
