@@ -1160,7 +1160,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		for (unsigned int j = 0; j < nobs; j++) {
 			if (good[j] == true) {
 				double this_val = eta[j] + (y[j] - mu[j])/mu_eta_val[j];
-				z[j] = this_val;
+				z[num_index] = this_val;
 				num_index++;
 			}
 		}
@@ -1170,7 +1170,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		for (unsigned int j = 0; j < nobs; j++) {
  			if (good[j] == true) {
 				double this_val = sqrt(pow(mu_eta_val[j],2.0))/varmu[j];
-				w[j] = this_val;
+				w[num_index] = this_val;
 				num_index++;
 			}
 		}
@@ -1192,7 +1192,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		}
 		
 		double *prefit_y = (double *)malloc(num_true*sizeof(double));
-		for (unsigned int j = 0; j < nobs; j++) {
+		for (unsigned int j = 0; j < num_true; j++) {
 			prefit_y[j] = z[j] * w[j];
 		}
 		
@@ -1204,7 +1204,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 		// printf("Breakpoint Upsilon 2\n");
 		// exit(0);
 		
-		lm = Cdqrls(prefit_x, prefit_y, min(1e-7, epsilon/1000), false, nobs, nvars);
+		lm = Cdqrls(prefit_x, prefit_y, min(1e-7, epsilon/1000), false, num_true, nvars);
 		
 		// DEBUG
 		// printf("Breakpoint Tau 2\n");
