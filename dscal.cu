@@ -26,7 +26,7 @@
 
 /*       .. Scalar Arguments .. */
 /*       DOUBLE PRECISION DA */
-/*       INTEGER INCX,N */
+/*       int INCX,N */
 /*       .. */
 /*       .. Array Arguments .. */
 /*       DOUBLE PRECISION DX(*) */
@@ -65,14 +65,14 @@
 /* > \endverbatim */
 /* > */
 /*  ===================================================================== */
-/* Subroutine */ __device__ int dscal_(integer *n, doublereal *da, doublereal *dx, 
-	integer *incx)
+/* Subroutine */ __device__ int dscal_(int *n, doublereal *da, doublereal *dx, 
+	int *incx)
 {
     /* System generated locals */
-    integer i__1, i__2;
+    int i__1, i__2;
 
     /* Local variables */
-    integer i__, m, mp1, nincx;
+    int i__, m, mp1, nincx;
 
 
 /*  -- Reference BLAS level1 routine (version 3.4.0) -- */

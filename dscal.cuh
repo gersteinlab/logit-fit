@@ -1,5 +1,5 @@
 #include "f2c.h"
 
-__device__ int dscal_(integer *n, doublereal *da, doublereal *dx, 
-	integer *incx);
+__device__ int dscal_(int *n, doublereal *da, doublereal *dx, 
+	int *incx);
 	

@@ -25,7 +25,7 @@
 /*       SUBROUTINE DCOPY(N,DX,INCX,DY,INCY) */
 
 /*       .. Scalar Arguments .. */
-/*       INTEGER INCX,INCY,N */
+/*       int INCX,INCY,N */
 /*       .. */
 /*       .. Array Arguments .. */
 /*       DOUBLE PRECISION DX(*),DY(*) */
@@ -63,14 +63,14 @@
 /* > \endverbatim */
 /* > */
 /*  ===================================================================== */
-/* Subroutine */ __device__ int dcopy_(integer *n, doublereal *dx, integer *incx, 
-	doublereal *dy, integer *incy)
+/* Subroutine */ __device__ int dcopy_(int *n, doublereal *dx, int *incx, 
+	doublereal *dy, int *incy)
 {
     /* System generated locals */
-    integer i__1;
+    int i__1;
 
     /* Local variables */
-    integer i__, m, ix, iy, mp1;
+    int i__, m, ix, iy, mp1;
 
 
 /*  -- Reference BLAS level1 routine (version 3.4.0) -- */

@@ -17,7 +17,7 @@
 
 /* Table of constant values */
 
-__device__ static integer c__100 = 1;
+__device__ static int c__100 = 1;
 
 
 /*     dqrsl applies the output of dqrdc to compute coordinate */
@@ -43,14 +43,14 @@ __device__ static integer c__100 = 1;
 /*        x      double precision(ldx,p). */
 /*               x contains the output of dqrdc. */
 
-/*        ldx    integer. */
+/*        ldx    int. */
 /*               ldx is the leading dimension of the array x. */
 
-/*        n      integer. */
+/*        n      int. */
 /*               n is the number of rows of the matrix xk.  it must */
 /*               have the same value as n in dqrdc. */
 
-/*        k      integer. */
+/*        k      int. */
 /*               k is the number of columns of the matrix xk.  k */
 /*               must nnot be greater than min(n,p), where p is the */
 /*               same as in the calling sequence to dqrdc. */
@@ -62,7 +62,7 @@ __device__ static integer c__100 = 1;
 /*               y contains an n-vector that is to be manipulated */
 /*               by dqrsl. */
 
-/*        job    integer. */
+/*        job    int. */
 /*               job specifies what is to be computed.  job has */
 /*               the decimal expansion abcde, with the following */
 /*               meaning. */
@@ -111,7 +111,7 @@ __device__ static integer c__100 = 1;
 /*               the orthogonal projection of y onto the column space */
 /*               of x. */
 
-/*        info   integer. */
+/*        info   int. */
 /*               info is zero unless the computation of b has */
 /*               been requested and r is exactly singular.  in */
 /*               this case, info is the index of the first zero */
@@ -158,29 +158,29 @@ __device__ static integer c__100 = 1;
 /*     BLAS      daxpy,dcopy,ddot */
 /*     Fortran   dabs,min0,mod */
 
-/* Subroutine */ __device__ int dqrsl_(doublereal *x, integer *ldx, integer *n, integer *
+/* Subroutine */ __device__ int dqrsl_(doublereal *x, int *ldx, int *n, int *
 	k, doublereal *qraux, doublereal *y, doublereal *qy, doublereal *qty, 
-	doublereal *b, doublereal *rsd, doublereal *xb, integer *job, integer 
+	doublereal *b, doublereal *rsd, doublereal *xb, int *job, int 
 	*info)
 {
     /* System generated locals */
-    integer x_dim1, x_offset, i__1, i__2;
+    int x_dim1, x_offset, i__1, i__2;
 
     /* Local variables */
-    integer i__, j;
+    int i__, j;
     doublereal t;
     logical cb;
-    integer jj;
+    int jj;
     logical cr;
-    integer ju, kp1;
+    int ju, kp1;
     logical cxb, cqy;
-//     extern __device__ doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
-// 	    integer *);
+//     extern __device__ doublereal ddot_(int *, doublereal *, int *, doublereal *, 
+// 	    int *);
     doublereal temp;
     logical cqty;
-//     extern __device__ /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
-// 	    doublereal *, integer *), daxpy_(integer *, doublereal *, 
-// 	    doublereal *, integer *, doublereal *, integer *);
+//     extern __device__ /* Subroutine */ int dcopy_(int *, doublereal *, int *, 
+// 	    doublereal *, int *), daxpy_(int *, doublereal *, 
+// 	    doublereal *, int *, doublereal *, int *);
 
 
 /*     internal variables */
