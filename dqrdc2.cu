@@ -217,6 +217,7 @@ L120:
 /*           compute the householder transformation for column l. */
 
 	i__2 = *n - (l+1) + 1;
+	printf("Breakpoint 1d\n"); // DEBUG
 	nrmxl = dnrm2_(&i__2, &x[l + l * x_dim1], &c__10);
 	if (nrmxl == 0.) {
 	    goto L180;
@@ -278,6 +279,7 @@ L120:
 	    goto L140;
 L130:
 	    i__3 = *n - (l+1);
+	    printf("Breakpoint 1e\n"); // DEBUG
 	    qraux[j] = dnrm2_(&i__3, &x[l + j * x_dim1], &c__10);
 	    work[j + work_dim1] = qraux[j];
 L140:
