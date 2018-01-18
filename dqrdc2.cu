@@ -249,7 +249,15 @@ L120:
 	    goto L170;
 	}
 	i__2 = *p;
+	
+	// DEBUG
+	printf("1: %d; 2: %d\n", lp1, i__2);
+	
 	for (int j = lp1-1; j < i__2; ++j) {
+	
+			// DEBUG
+			printf("Loop index: %d\n", j);
+	
 	    i__3 = *n - (l+1) + 1;
 	    t = -ddot_(&i__3, &x[l + l * x_dim1], &c__10, &x[l + j * x_dim1], &
 		    c__10) / x[l + l * x_dim1];
