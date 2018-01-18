@@ -176,7 +176,7 @@ __device__ static int c__10 = 1;
 /*     avoids infinite cycling. */
 
 L80:
-	if (l >= *k || qraux[l] >= work[l + (work_dim1 << 1)] * *tol) {
+	if ((l-1) >= *k || qraux[l] >= work[l + work_dim1] * *tol) {
 	    goto L120;
 	}
 	lp1 = l + 1;
@@ -185,7 +185,7 @@ L80:
 	    t = x[i__ + l * x_dim1];
 	    i__3 = *p;
 	    for (int j = lp1-1; j < i__3; ++j) {
-		x[i__ + (j - 1) * x_dim1] = x[i__ + j * x_dim1];
+		x[i__ + j * x_dim1] = x[i__ + (j+1) * x_dim1];
 /* L90: */
 	    }
 	    x[i__ + *p * x_dim1] = t;
@@ -193,30 +193,30 @@ L80:
 	}
 	i__ = jpvt[l];
 	t = qraux[l];
-	tt = work[l + work_dim1];
-	ttt = work[l + (work_dim1 << 1)];
+	tt = work[l + 0*work_dim1];
+	ttt = work[l + work_dim1];
 	i__2 = *p;
 	for (int j = lp1-1; j < i__2; ++j) {
-	    jpvt[j - 1] = jpvt[j];
-	    qraux[j - 1] = qraux[j];
-	    work[j - 1 + work_dim1] = work[j + work_dim1];
-	    work[j - 1 + (work_dim1 << 1)] = work[j + (work_dim1 << 1)];
+	    jpvt[j] = jpvt[j+1];
+	    qraux[j] = qraux[j+1];
+	    work[j + 0*work_dim1] = work[(j+1) + 0*work_dim1];
+	    work[j + work_dim1] = work[(j+1) + work_dim1];
 /* L110: */
 	}
-	jpvt[*p] = i__;
-	qraux[*p] = t;
-	work[*p + 0*work_dim1] = tt;
-	work[*p + work_dim1] = ttt;
+	jpvt[*p-1] = i__;
+	qraux[*p-1] = t;
+	work[*p-1 + 0*work_dim1] = tt;
+	work[*p-1 + work_dim1] = ttt;
 	--(*k);
 	goto L80;
 L120:
-	if (l == *n) {
+	if (l == *n-1) {
 	    goto L190;
 	}
 
 /*           compute the householder transformation for column l. */
 
-	i__2 = *n - l + 1;
+	i__2 = *n - (l+1) + 1;
 	nrmxl = dnrm2_(&i__2, &x[l + l * x_dim1], &c__10);
 	if (nrmxl == 0.) {
 	    goto L180;
@@ -235,7 +235,7 @@ L120:
 	// DEBUG
 	// printf("Breakpoint 1c\n");
 	
-	i__2 = *n - l + 1;
+	i__2 = *n - (l+1) + 1;
 	d__1 = 1. / nrmxl;
 	dscal_(&i__2, &d__1, &x[l + l * x_dim1], &c__10);
 	x[l + l * x_dim1] += 1.;
@@ -243,13 +243,13 @@ L120:
 /*              apply the transformation to the remaining columns, */
 /*              updating the norms. */
 
-	lp1 = l + 1;
+	lp1 = (l+1) + 1;
 	if (*p < lp1) {
 	    goto L170;
 	}
 	i__2 = *p;
-	for (int j = lp1; j <= i__2; ++j) {
-	    i__3 = *n - l + 1;
+	for (int j = lp1-1; j < i__2; ++j) {
+	    i__3 = *n - (l+1) + 1;
 	    t = -ddot_(&i__3, &x[l + l * x_dim1], &c__10, &x[l + j * x_dim1], &
 		    c__10) / x[l + l * x_dim1];
 	    i__3 = *n - l + 1;
@@ -277,8 +277,8 @@ L120:
 	    qraux[j] *= sqrt(t);
 	    goto L140;
 L130:
-	    i__3 = *n - l;
-	    qraux[j] = dnrm2_(&i__3, &x[l + 1 + j * x_dim1], &c__10);
+	    i__3 = *n - (l+1);
+	    qraux[j] = dnrm2_(&i__3, &x[l + j * x_dim1], &c__10);
 	    work[j + work_dim1] = qraux[j];
 L140:
 L150:

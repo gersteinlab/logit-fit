@@ -92,7 +92,7 @@
 /*     .. Intrinsic Functions .. */
 /*     .. */
     /* Parameter adjustments */
-    --dx;
+    // --dx;
 
     /* Function Body */
     if (*n <= 0 || *incx <= 0) {
@@ -108,7 +108,7 @@
 	m = *n % 5;
 	if (m != 0) {
 	    i__1 = m;
-	    for (i__ = 1; i__ <= i__1; ++i__) {
+	    for (i__ = 0; i__ < i__1; ++i__) {
 		dx[i__] = *da * dx[i__];
 	    }
 	    if (*n < 5) {
@@ -117,7 +117,7 @@
 	}
 	mp1 = m + 1;
 	i__1 = *n;
-	for (i__ = mp1; i__ <= i__1; i__ += 5) {
+	for (i__ = m; i__ < i__1; i__ += 5) {
 	    dx[i__] = *da * dx[i__];
 	    dx[i__ + 1] = *da * dx[i__ + 1];
 	    dx[i__ + 2] = *da * dx[i__ + 2];
@@ -131,7 +131,7 @@
 	nincx = *n * *incx;
 	i__1 = nincx;
 	i__2 = *incx;
-	for (i__ = 1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
+	for (i__ = 0; i__2 < 0 ? i__ > i__1 : i__ < i__1; i__ += i__2) {
 	    dx[i__] = *da * dx[i__];
 	}
     }
