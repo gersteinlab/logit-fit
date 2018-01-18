@@ -261,7 +261,7 @@ L120:
 	    i__3 = *n - (l+1) + 1;
 	    t = -ddot_(&i__3, &x[l + l * x_dim1], &c__10, &x[l + j * x_dim1], &
 		    c__10) / x[l + l * x_dim1];
-	    i__3 = *n - l + 1;
+	    i__3 = *n - (l+1) + 1;
 	    daxpy_(&i__3, &t, &x[l + l * x_dim1], &c__10, &x[l + j * x_dim1], &
 		    c__10);
 	    if (qraux[j] == 0.) {
