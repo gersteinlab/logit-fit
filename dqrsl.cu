@@ -313,6 +313,7 @@ L70:
 		printf("Breakpoint B1\n");
 
     i__1 = ju;
+    printf("ju: %d\n", ju); // DEBUG
     for (j = 0; j < i__1; ++j) {
 	if (qraux[j] == 0.) {
 	    goto L80;
