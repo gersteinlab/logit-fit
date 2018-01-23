@@ -126,7 +126,19 @@ __device__ doublereal ddot_(int *n, doublereal *dx, int *incx, doublereal *dy,
 	mp1 = m + 1;
 	i__1 = *n;
 	for (i__ = mp1-1; i__ < i__1; i__ += 5) {
-		printf("Breakpoint C3: %d\n", i__); // DEBUG
+		// DEBUG
+		printf("Breakpoint C3: %d\n", i__);
+		printf("dx[i]: %f\n", dx[i__]);
+		printf("dy[i]: %f\n", dy[i__]);
+		printf("dx[i+1]: %f\n", dx[i__ + 1]);
+		printf("dy[i+1]: %f\n", dy[i__ + 1]);
+		printf("dx[i+2]: %f\n", dx[i__ + 2]);
+		printf("dy[i+2]: %f\n", dy[i__ + 2]);
+		printf("dx[i+3]: %f\n", dx[i__ + 3]);
+		printf("dy[i+3]: %f\n", dy[i__ + 3]);
+		printf("dx[i+4]: %f\n", dx[i__ + 4]);
+		printf("dy[i+4]: %f\n", dy[i__ + 4]);
+		
 	    dtemp = dtemp + dx[i__] * dy[i__] + dx[i__ + 1] * dy[i__ + 1] + 
 		    dx[i__ + 2] * dy[i__ + 2] + dx[i__ + 3] * dy[i__ + 3] + 
 		    dx[i__ + 4] * dy[i__ + 4];
