@@ -156,7 +156,7 @@ __device__ static int c__1110 = 1110;
 	i__1 = *ny;
 	for (jj = 0; jj < i__1; ++jj) {
 /* L20: */
-	    dqrsl_(&x[x_dim1], n, n, k, &qraux[0], &y[(jj+1) * y_dim1], &
+	    dqrsl_(&x[x_dim1-1], n, n, k, &qraux[0], &y[(jj+1) * y_dim1], &
 		    rsd[(jj+1) * rsd_dim1], &qty[(jj+1) * qty_dim1], &b[(jj+1) * 
 		    b_dim1], &rsd[(jj+1) * rsd_dim1], &rsd[(jj+1) * rsd_dim1], &c__1110, &info);
 	}
