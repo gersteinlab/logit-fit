@@ -225,30 +225,39 @@ __device__ static int c__100 = 1;
 	printf("Breakpoint 4\n");
 
     if (ju != 0) {
+			printf("Breakpoint 4a\n"); // DEBUG
 	goto L40;
     }
     if (cqy) {
+    	printf("Breakpoint 4b\n"); // DEBUG
 	qy[0] = y[0];
     }
     if (cqty) {
+    	printf("Breakpoint 4c\n"); // DEBUG
 	qty[0] = y[0];
     }
     if (cxb) {
+    	printf("Breakpoint 4d\n"); // DEBUG
 	xb[0] = y[0];
     }
     if (! cb) {
+    	printf("Breakpoint 4e\n"); // DEBUG
 	goto L30;
     }
     if (x[x_dim1-1] != 0.) {
+    	printf("Breakpoint 4f\n"); // DEBUG
 	goto L10;
     }
+    	printf("Breakpoint 4g\n"); // DEBUG
     *info = 1;
     goto L20;
 L10:
+		printf("Breakpoint 4h\n"); // DEBUG
     b[0] = y[0] / x[x_dim1-1];
 L20:
 L30:
     if (cr) {
+    	printf("Breakpoint 4i\n"); // DEBUG
 	rsd[0] = 0.;
     }
     goto L250;
@@ -257,12 +266,15 @@ L40:
 /*        set up to compute qy or qty. */
 
     if (cqy) {
+    	printf("Breakpoint 4j\n"); // DEBUG
 	dcopy_(n, &y[0], &c__100, &qy[0], &c__100);
     }
     if (cqty) {
+    	printf("Breakpoint 4k\n"); // DEBUG
 	dcopy_(n, &y[0], &c__100, &qty[0], &c__100);
     }
     if (! cqy) {
+    	printf("Breakpoint 4l\n"); // DEBUG
 	goto L70;
     }
 
