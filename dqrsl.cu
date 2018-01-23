@@ -239,13 +239,13 @@ __device__ static int c__100 = 1;
     if (! cb) {
 	goto L30;
     }
-    if (x[x_dim1] != 0.) {
+    if (x[x_dim1-1] != 0.) {
 	goto L10;
     }
     *info = 1;
     goto L20;
 L10:
-    b[0] = y[0] / x[x_dim1];
+    b[0] = y[0] / x[x_dim1-1];
 L20:
 L30:
     if (cr) {
