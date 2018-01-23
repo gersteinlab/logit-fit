@@ -1594,7 +1594,7 @@ __device__ void glm_fit (double* y, double** x, int* y_size, int* x_size, int* l
 	// double** qr = outfit.getQr();
 	printf("<-- QR matrix -->\n");
 	for (int i = 0; i < nvars; i++) {
-		for (int j = 0; j < nobs; i++) {
+		for (int j = 0; j < nobs; j++) {
 			printf("%f", qr[i][j]);
 			if (j != nobs-1) {
 				printf("\t");
