@@ -193,7 +193,7 @@ __device__ static int c__100 = 1;
     /* Parameter adjustments */
     x_dim1 = *ldx;
     x_offset = 1 + x_dim1;
-    x -= x_offset;
+//     x -= x_offset;
 //     --qraux;
 //     --y;
 //     --qy;
