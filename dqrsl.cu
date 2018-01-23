@@ -193,13 +193,13 @@ __device__ static int c__100 = 1;
     x_dim1 = *ldx;
     x_offset = 1 + x_dim1;
     x -= x_offset;
-    --qraux;
-    --y;
-    --qy;
-    --qty;
-    --b;
-    --rsd;
-    --xb;
+//     --qraux;
+//     --y;
+//     --qy;
+//     --qty;
+//     --b;
+//     --rsd;
+//     --xb;
 
     /* Function Body */
     *info = 0;
@@ -221,28 +221,28 @@ __device__ static int c__100 = 1;
 	goto L40;
     }
     if (cqy) {
-	qy[1] = y[1];
+	qy[0] = y[0];
     }
     if (cqty) {
-	qty[1] = y[1];
+	qty[0] = y[0];
     }
     if (cxb) {
-	xb[1] = y[1];
+	xb[0] = y[0];
     }
     if (! cb) {
 	goto L30;
     }
-    if (x[x_dim1 + 1] != 0.) {
+    if (x[x_dim1] != 0.) {
 	goto L10;
     }
     *info = 1;
     goto L20;
 L10:
-    b[1] = y[1] / x[x_dim1 + 1];
+    b[0] = y[0] / x[x_dim1];
 L20:
 L30:
     if (cr) {
-	rsd[1] = 0.;
+	rsd[0] = 0.;
     }
     goto L250;
 L40:
@@ -250,10 +250,10 @@ L40:
 /*        set up to compute qy or qty. */
 
     if (cqy) {
-	dcopy_(n, &y[1], &c__100, &qy[1], &c__100);
+	dcopy_(n, &y[0], &c__100, &qy[0], &c__100);
     }
     if (cqty) {
-	dcopy_(n, &y[1], &c__100, &qty[1], &c__100);
+	dcopy_(n, &y[0], &c__100, &qty[0], &c__100);
     }
     if (! cqy) {
 	goto L70;
@@ -262,17 +262,17 @@ L40:
 /*           compute qy. */
 
     i__1 = ju;
-    for (jj = 1; jj <= i__1; ++jj) {
-	j = ju - jj + 1;
+    for (jj = 0; jj < i__1; ++jj) {
+	j = ju - jj - 1;
 	if (qraux[j] == 0.) {
 	    goto L50;
 	}
 	temp = x[j + j * x_dim1];
 	x[j + j * x_dim1] = qraux[j];
-	i__2 = *n - j + 1;
+	i__2 = *n - j - 1;
 	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__100, &qy[j], &c__100) / x[j + j 
 		* x_dim1];
-	i__2 = *n - j + 1;
+	i__2 = *n - j - 1;
 	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__100, &qy[j], &c__100);
 	x[j + j * x_dim1] = temp;
 L50:
@@ -287,16 +287,16 @@ L70:
 /*           compute trans(q)*y. */
 
     i__1 = ju;
-    for (j = 1; j <= i__1; ++j) {
+    for (j = 0; j < i__1; ++j) {
 	if (qraux[j] == 0.) {
 	    goto L80;
 	}
 	temp = x[j + j * x_dim1];
 	x[j + j * x_dim1] = qraux[j];
-	i__2 = *n - j + 1;
+	i__2 = *n - j - 1;
 	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__100, &qty[j], &c__100) / x[j + 
 		j * x_dim1];
-	i__2 = *n - j + 1;
+	i__2 = *n - j - 1;
 	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__100, &qty[j], &c__100);
 	x[j + j * x_dim1] = temp;
 L80:
@@ -308,21 +308,21 @@ L100:
 /*        set up to compute b, rsd, or xb. */
 
     if (cb) {
-	dcopy_(k, &qty[1], &c__100, &b[1], &c__100);
+	dcopy_(k, &qty[0], &c__100, &b[0], &c__100);
     }
     kp1 = *k + 1;
     if (cxb) {
-	dcopy_(k, &qty[1], &c__100, &xb[1], &c__100);
+	dcopy_(k, &qty[0], &c__100, &xb[0], &c__100);
     }
     if (cr && *k < *n) {
 	i__1 = *n - *k;
-	dcopy_(&i__1, &qty[kp1], &c__100, &rsd[kp1], &c__100);
+	dcopy_(&i__1, &qty[k], &c__100, &rsd[k], &c__100);
     }
     if (! cxb || kp1 > *n) {
 	goto L120;
     }
     i__1 = *n;
-    for (i__ = kp1; i__ <= i__1; ++i__) {
+    for (i__ = k; i__ < i__1; ++i__) {
 	xb[i__] = 0.;
 /* L110: */
     }
@@ -331,7 +331,7 @@ L120:
 	goto L140;
     }
     i__1 = *k;
-    for (i__ = 1; i__ <= i__1; ++i__) {
+    for (i__ = 0; i__ < i__1; ++i__) {
 	rsd[i__] = 0.;
 /* L130: */
     }
@@ -343,8 +343,8 @@ L140:
 /*           compute b. */
 
     i__1 = *k;
-    for (jj = 1; jj <= i__1; ++jj) {
-	j = *k - jj + 1;
+    for (jj = 0; jj < i__1; ++jj) {
+	j = *k - jj - 1;
 	if (x[j + j * x_dim1] != 0.) {
 	    goto L150;
 	}
@@ -353,12 +353,12 @@ L140:
 	goto L180;
 L150:
 	b[j] /= x[j + j * x_dim1];
-	if (j == 1) {
+	if (j == 0) {
 	    goto L160;
 	}
 	t = -b[j];
-	i__2 = j - 1;
-	daxpy_(&i__2, &t, &x[j * x_dim1 + 1], &c__100, &b[1], &c__100);
+	i__2 = j;
+	daxpy_(&i__2, &t, &x[j * x_dim1], &c__100, &b[0], &c__100);
 L160:
 /* L170: */
 	;
@@ -372,8 +372,8 @@ L190:
 /*           compute rsd or xb as required. */
 
     i__1 = ju;
-    for (jj = 1; jj <= i__1; ++jj) {
-	j = ju - jj + 1;
+    for (jj = 0; jj < i__1; ++jj) {
+	j = ju - jj - 1;
 	if (qraux[j] == 0.) {
 	    goto L220;
 	}
@@ -382,19 +382,19 @@ L190:
 	if (! cr) {
 	    goto L200;
 	}
-	i__2 = *n - j + 1;
+	i__2 = *n - j;
 	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__100, &rsd[j], &c__100) / x[j + 
 		j * x_dim1];
-	i__2 = *n - j + 1;
+	i__2 = *n - j;
 	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__100, &rsd[j], &c__100);
 L200:
 	if (! cxb) {
 	    goto L210;
 	}
-	i__2 = *n - j + 1;
+	i__2 = *n - j;
 	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__100, &xb[j], &c__100) / x[j + j 
 		* x_dim1];
-	i__2 = *n - j + 1;
+	i__2 = *n - j;
 	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__100, &xb[j], &c__100);
 L210:
 	x[j + j * x_dim1] = temp;

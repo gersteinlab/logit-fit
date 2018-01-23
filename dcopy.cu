@@ -90,8 +90,8 @@
 /*     .. Intrinsic Functions .. */
 /*     .. */
     /* Parameter adjustments */
-    --dy;
-    --dx;
+//     --dy;
+//     --dx;
 
     /* Function Body */
     if (*n <= 0) {
@@ -107,7 +107,7 @@
 	m = *n % 7;
 	if (m != 0) {
 	    i__1 = m;
-	    for (i__ = 1; i__ <= i__1; ++i__) {
+	    for (i__ = 0; i__ < i__1; ++i__) {
 		dy[i__] = dx[i__];
 	    }
 	    if (*n < 7) {
@@ -116,7 +116,7 @@
 	}
 	mp1 = m + 1;
 	i__1 = *n;
-	for (i__ = mp1; i__ <= i__1; i__ += 7) {
+	for (i__ = (mp1-1); i__ < i__1; i__ += 7) {
 	    dy[i__] = dx[i__];
 	    dy[i__ + 1] = dx[i__ + 1];
 	    dy[i__ + 2] = dx[i__ + 2];
@@ -130,16 +130,16 @@
 /*        code for unequal increments or equal increments */
 /*          not equal to 1 */
 
-	ix = 1;
-	iy = 1;
+	ix = 0;
+	iy = 0;
 	if (*incx < 0) {
-	    ix = (-(*n) + 1) * *incx + 1;
+	    ix = (-(*n) + 1) * *incx;
 	}
 	if (*incy < 0) {
-	    iy = (-(*n) + 1) * *incy + 1;
+	    iy = (-(*n) + 1) * *incy;
 	}
 	i__1 = *n;
-	for (i__ = 1; i__ <= i__1; ++i__) {
+	for (i__ = 0; i__ < i__1; ++i__) {
 	    dy[iy] = dx[ix];
 	    ix += *incx;
 	    iy += *incy;
