@@ -316,10 +316,10 @@ L70:
 	}
 	temp = x[j + j * x_dim1];
 	x[j + j * x_dim1] = qraux[j];
-	i__2 = *n - j - 1;
+	i__2 = *n - j;
 	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__100, &qty[j], &c__100) / x[j + 
 		j * x_dim1];
-	i__2 = *n - j - 1;
+	i__2 = *n - j;
 	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__100, &qty[j], &c__100);
 	x[j + j * x_dim1] = temp;
 L80:
