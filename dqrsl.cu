@@ -14,6 +14,7 @@
 #include "ddot.cuh"
 #include "dcopy.cuh"
 #include "daxpy.cuh"
+#include <stdio.h>
 
 /* Table of constant values */
 
