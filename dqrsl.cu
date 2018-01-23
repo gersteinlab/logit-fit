@@ -309,19 +309,25 @@ L70:
 
 /*           compute trans(q)*y. */
 
+		// DEBUG
+		printf("Breakpoint B1\n");
+
     i__1 = ju;
     for (j = 0; j < i__1; ++j) {
 	if (qraux[j] == 0.) {
 	    goto L80;
 	}
+	printf("Breakpoint B2\n"); // DEBUG
 	temp = x[j + j * x_dim1];
 	x[j + j * x_dim1] = qraux[j];
 	i__2 = *n - j;
+	printf("Breakpoint B3\n"); // DEBUG
 	t = -ddot_(&i__2, &x[j + j * x_dim1], &c__100, &qty[j], &c__100) / x[j + 
 		j * x_dim1];
 	i__2 = *n - j;
 	daxpy_(&i__2, &t, &x[j + j * x_dim1], &c__100, &qty[j], &c__100);
 	x[j + j * x_dim1] = temp;
+	printf("Breakpoint B4\n"); // DEBUG
 L80:
 /* L90: */
 	;
