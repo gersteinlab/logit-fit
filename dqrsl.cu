@@ -203,6 +203,9 @@ __device__ static int c__100 = 1;
 
     /* Function Body */
     *info = 0;
+    
+    // DEBUG
+    printf("Breakpoint 3\n");
 
 /*     determine what is to be computed. */
 
@@ -216,6 +219,9 @@ __device__ static int c__100 = 1;
     ju = min(i__1,i__2);
 
 /*     special action when n=1. */
+
+	// DEBUG
+	printf("Breakpoint 4\n");
 
     if (ju != 0) {
 	goto L40;
@@ -260,6 +266,9 @@ L40:
     }
 
 /*           compute qy. */
+
+	// DEBUG
+	printf("Breakpoint 5\n");
 
     i__1 = ju;
     for (jj = 0; jj < i__1; ++jj) {
@@ -307,6 +316,9 @@ L100:
 
 /*        set up to compute b, rsd, or xb. */
 
+	// DEBUG
+	printf("Breakpoint 6\n");
+
     if (cb) {
 	dcopy_(k, &qty[0], &c__100, &b[0], &c__100);
     }
@@ -342,6 +354,9 @@ L140:
 
 /*           compute b. */
 
+	// DEBUG
+	printf("Breakpoint 7\n");
+
     i__1 = *k;
     for (jj = 0; jj < i__1; ++jj) {
 	j = *k - jj - 1;
@@ -370,6 +385,9 @@ L190:
     }
 
 /*           compute rsd or xb as required. */
+
+	// DEBUG
+	printf("Breakpoint 8\n");
 
     i__1 = ju;
     for (jj = 0; jj < i__1; ++jj) {

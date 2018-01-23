@@ -173,6 +173,9 @@ __device__ static int c__1110 = 1110;
 
 /*     set the unused components of b to zero. */
 
+	// DEBUG
+	printf("Breakpoint 9\n");
+
     kk = *k + 1;
     i__2 = *p;
     for (j = (kk-1); j < i__2; ++j) {
