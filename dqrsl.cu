@@ -313,7 +313,7 @@ L70:
 		printf("Breakpoint B1\n");
 
     i__1 = ju;
-    printf("ju: %d\n", ju); // DEBUG
+    // printf("ju: %d\n", ju); // DEBUG
     for (j = 0; j < i__1; ++j) {
 	if (qraux[j] == 0.) {
 	    goto L80;
@@ -322,7 +322,7 @@ L70:
 	temp = x[j + (j+1) * x_dim1];
 	x[j + (j+1) * x_dim1] = qraux[j];
 	i__2 = *n - j;
-	printf("Breakpoint B3\n"); // DEBUG
+	printf("Breakpoint B3: %d\n", i__2); // DEBUG
 	t = -ddot_(&i__2, &x[j + (j+1) * x_dim1], &c__100, &qty[j], &c__100) / x[j + 
 		(j+1) * x_dim1];
 	i__2 = *n - j;
