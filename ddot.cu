@@ -130,8 +130,8 @@ __device__ doublereal ddot_(int *n, doublereal *dx, int *incx, doublereal *dy,
 		printf("Breakpoint C3: %d\n", i__);
 		printf("dx[i]: %f\n", dx[i__]);
 		printf("dy[i]: %f\n", dy[i__]);
-		printf("dx[i+1]: %f\n", dx[i__ + 1]);
 		printf("dy[i+1]: %f\n", dy[i__ + 1]);
+		printf("dx[i+1]: %f\n", dx[i__ + 1]);
 		printf("dx[i+2]: %f\n", dx[i__ + 2]);
 		printf("dy[i+2]: %f\n", dy[i__ + 2]);
 		printf("dx[i+3]: %f\n", dx[i__ + 3]);
