@@ -102,6 +102,8 @@ __device__ doublereal ddot_(int *n, doublereal *dx, int *incx, doublereal *dy,
 	return ret_val;
     }
     if (*incx == 1 && *incy == 1) {
+    
+    	printf("Breakpoint C1\n"); // DEBUG
 
 /*        code for both increments equal to 1 */
 
@@ -119,6 +121,7 @@ __device__ doublereal ddot_(int *n, doublereal *dx, int *incx, doublereal *dy,
 		return ret_val;
 	    }
 	}
+	printf("Breakpoint C2\n"); // DEBUG
 	mp1 = m + 1;
 	i__1 = *n;
 	for (i__ = mp1-1; i__ < i__1; i__ += 5) {
@@ -126,6 +129,7 @@ __device__ doublereal ddot_(int *n, doublereal *dx, int *incx, doublereal *dy,
 		    dx[i__ + 2] * dy[i__ + 2] + dx[i__ + 3] * dy[i__ + 3] + 
 		    dx[i__ + 4] * dy[i__ + 4];
 	}
+	printf("Breakpoint C3\n"); // DEBUG
     } else {
 
 /*        code for unequal increments or equal increments */
