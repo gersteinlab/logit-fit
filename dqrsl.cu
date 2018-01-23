@@ -272,6 +272,7 @@ L40:
     if (cqty) {
     	printf("Breakpoint 4k\n"); // DEBUG
 	dcopy_(n, &y[0], &c__100, &qty[0], &c__100);
+			printf("Breakpoint 4k1\n"); // DEBUG
     }
     if (! cqy) {
     	printf("Breakpoint 4l\n"); // DEBUG
